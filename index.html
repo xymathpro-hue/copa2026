@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Copa 2026 — Modelo Estatístico Zero-Prior</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <style>
   :root {
     --verde-noite: #0B3D2E;
@@ -336,7 +335,15 @@
   Projeto experimental — não afiliado à FIFA.
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <script src="data-loader.js"></script>
-<script src="charts.js"></script>
+<script>
+  // Aguarda Chart.js e DOM prontos antes de iniciar
+  window.addEventListener('load', function() {
+    var script = document.createElement('script');
+    script.src = 'charts.js';
+    document.body.appendChild(script);
+  });
+</script>
 </body>
 </html>
