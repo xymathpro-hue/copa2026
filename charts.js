@@ -116,48 +116,80 @@ function montarGraficoEvolucao(dados, selecionados) {
   });
 }
 
-// ─── 02 Ataque × Defesa (com bandeiras via pointStyle nativo) ─────────
+// ─── 02 Ataque × Defesa (bandeiras no canvas + tooltip HTML customizado) ─
 async function montarGraficoDispersao(dados) {
   await preCarregarBandeiras(dados.times);
 
-  const ctx = document.getElementById('chart-dispersao');
+  const canvas = document.getElementById('chart-dispersao');
+  const wrap   = canvas.parentElement;
 
-  // Um dataset por time — assim cada ponto tem seu próprio pointStyle (bandeira)
-  const datasets = dados.times.map(t => {
-    const iso = FLAG_ISO[t.time];
-    const img = imagensCache[t.time];
-    return {
-      label: t.time,
-      data: [{
-        x: parseFloat(t.ataque) || 1.35,
-        y: parseFloat(t.defesa) > 0 ? (3 - parseFloat(t.defesa)) : 1.65,
-        label: t.time,
-        grupo: t.grupo
-      }],
-      pointStyle: img || 'circle',
-      pointRadius: img ? 14 : 6,
-      pointHoverRadius: img ? 16 : 8,
-      backgroundColor: img ? 'rgba(0,0,0,0)' : '#E8B931',
-      borderColor: 'rgba(0,0,0,0)',
-      pointBorderColor: 'rgba(0,0,0,0)',
-      pointHoverBorderColor: '#E8B931',
-      pointHoverBorderWidth: 2,
-      pointHoverBackgroundColor: img ? 'rgba(232,185,49,0.1)' : '#E8B931',
-    };
-  });
+  // Criar tooltip HTML fixo (invisível por padrão)
+  let tooltipEl = document.getElementById('tooltip-dispersao');
+  if (!tooltipEl) {
+    tooltipEl = document.createElement('div');
+    tooltipEl.id = 'tooltip-dispersao';
+    tooltipEl.style.cssText = `
+      position:absolute;pointer-events:none;display:none;z-index:99;
+      background:rgba(11,61,46,0.97);border:1px solid rgba(232,185,49,0.4);
+      border-radius:4px;padding:8px 12px;font-size:0.82rem;color:#F0F4ED;
+      white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.4);
+    `;
+    wrap.style.position = 'relative';
+    wrap.appendChild(tooltipEl);
+  }
+
+  const pontos = dados.times.map(t => ({
+    x: parseFloat(t.ataque) || 1.35,
+    y: parseFloat(t.defesa) > 0 ? (3 - parseFloat(t.defesa)) : 1.65,
+    label: t.time,
+    grupo: t.grupo,
+    rating: Math.round(parseFloat(t.rating)) || 1500
+  }));
+
+  // Plugin canvas para desenhar bandeiras
+  const pluginFlags = {
+    id: 'flags',
+    afterDatasetsDraw(chart) {
+      const { ctx, scales, chartArea } = chart;
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(chartArea.left, chartArea.top, chartArea.width, chartArea.height);
+      ctx.clip();
+      pontos.forEach(p => {
+        const px = scales.x.getPixelForValue(p.x);
+        const py = scales.y.getPixelForValue(p.y);
+        const img = imagensCache[p.label];
+        if (img) {
+          ctx.drawImage(img, px - 14, py - 11, 28, 21);
+        } else {
+          ctx.fillStyle = '#E8B931';
+          ctx.beginPath();
+          ctx.arc(px, py, 7, 0, Math.PI*2);
+          ctx.fill();
+        }
+      });
+      ctx.restore();
+    }
+  };
 
   if (chartDispersao) chartDispersao.destroy();
-  chartDispersao = new Chart(ctx, {
+  chartDispersao = new Chart(canvas, {
     type: 'scatter',
-    data: { datasets },
+    data: {
+      datasets: [{
+        data: pontos,
+        pointRadius: 0,
+        pointHoverRadius: 0,
+        backgroundColor: 'transparent'
+      }]
+    },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       layout: { padding: { top: 20, right: 24, bottom: 8, left: 8 } },
-      interaction: {
-        mode: 'nearest',
-        intersect: true,
-        axis: 'xy'
+      plugins: {
+        legend: { display: false },
+        tooltip: { enabled: false } // desabilitamos o tooltip nativo
       },
       scales: {
         x: {
@@ -171,27 +203,54 @@ async function montarGraficoDispersao(dados) {
           grid: { color: 'rgba(240,244,237,0.06)' }
         }
       },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: 'rgba(11,61,46,0.97)',
-          titleColor: '#E8B931',
-          bodyColor: '#F0F4ED',
-          borderColor: 'rgba(232,185,49,0.4)',
-          borderWidth: 1,
-          padding: 10,
-          callbacks: {
-            title: items => items[0].dataset.label,
-            label: item => [
-              `Grupo ${item.raw.grupo}`,
-              `Ataque: ${item.raw.x.toFixed(2)}`,
-              `Defesa: ${(3 - item.raw.y).toFixed(2)}`
-            ]
+      onHover: (event, elements, chart) => {
+        // Detectar qual bandeira o mouse está sobre
+        const rect = canvas.getBoundingClientRect();
+        const mx = event.native.clientX - rect.left;
+        const my = event.native.clientY - rect.top;
+        const scX = chart.scales.x;
+        const scY = chart.scales.y;
+
+        let encontrado = null;
+        pontos.forEach(p => {
+          const px = scX.getPixelForValue(p.x);
+          const py = scY.getPixelForValue(p.y);
+          if (Math.abs(mx - px) < 16 && Math.abs(my - py) < 13) {
+            encontrado = { p, px, py };
           }
+        });
+
+        if (encontrado) {
+          const { p, px, py } = encontrado;
+          const iso = FLAG_ISO[p.label];
+          const flagHtml = iso ? `<img src="https://flagcdn.com/20x15/${iso}.png" style="vertical-align:middle;margin-right:6px;">` : '';
+          tooltipEl.innerHTML = `
+            <div style="color:#E8B931;font-weight:600;margin-bottom:4px">${flagHtml}${p.label}</div>
+            <div>Grupo ${p.grupo} &nbsp;·&nbsp; Rating ${p.rating}</div>
+            <div>Ataque: ${p.x.toFixed(2)} &nbsp;·&nbsp; Defesa: ${(3 - p.y).toFixed(2)}</div>
+          `;
+          // Posicionar tooltip relativo ao wrapper
+          const wrapRect = wrap.getBoundingClientRect();
+          let left = px + 20;
+          let top  = py - 20;
+          if (left + 220 > wrap.offsetWidth) left = px - 230;
+          if (top < 0) top = py + 10;
+          tooltipEl.style.left = left + 'px';
+          tooltipEl.style.top  = top + 'px';
+          tooltipEl.style.display = 'block';
+          canvas.style.cursor = 'pointer';
+        } else {
+          tooltipEl.style.display = 'none';
+          canvas.style.cursor = 'default';
         }
       }
-    }
-    // sem plugin customizado — Chart.js nativo desenha as bandeiras via pointStyle
+    },
+    plugins: [pluginFlags]
+  });
+
+  // Esconder tooltip ao sair do canvas
+  canvas.addEventListener('mouseleave', () => {
+    tooltipEl.style.display = 'none';
   });
 }
 
