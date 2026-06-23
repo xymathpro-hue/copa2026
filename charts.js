@@ -357,8 +357,10 @@ function buscarClassificado(dados, slot) {
 }
 
 function montarBracket(dados) {
-  const container = document.getElementById('bracket-container');
-  if (!container) return;
+  try {
+    console.log('montarBracket iniciado, times:', dados?.times?.length);
+    const container = document.getElementById('bracket-container');
+    if (!container) { console.error('bracket-container não encontrado'); return; }
   container.innerHTML = '';
 
   const bracket = document.createElement('div');
@@ -434,6 +436,12 @@ function montarBracket(dados) {
 
   container.appendChild(bracket);
   document.getElementById('bracket-loading')?.remove();
+  console.log('montarBracket concluído');
+  } catch(e) {
+    console.error('Erro no montarBracket:', e);
+    const container = document.getElementById('bracket-container');
+    if (container) container.innerHTML = '<div style="color:#C1432A;padding:20px">Erro ao carregar chaveamento: ' + e.message + '</div>';
+  }
 }
 let timesSelecionados = [];
 
@@ -549,7 +557,9 @@ async function iniciar() {
   const tB = document.getElementById('time-b').value;
   montarGraficoRadar(dadosGlobais, tA, tB);
   montarTabela(dadosGlobais);
-  montarBracket(dadosGlobais);
+
+  // Bracket — rodar depois de tudo para garantir DOM pronto
+  setTimeout(() => montarBracket(dadosGlobais), 100);
 }
 
 // Iniciado pelo index.html após Chart.js carregar
