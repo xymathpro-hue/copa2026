@@ -173,9 +173,15 @@ async function montarGraficoDispersao(dados) {
       datasets: [{
         label: 'Seleções',
         data: pontos,
-        pointRadius: 0,
-        pointHoverRadius: 0,
-        backgroundColor: 'transparent'
+        pointRadius: 16,          // área de detecção grande o suficiente
+        pointHoverRadius: 16,
+        backgroundColor: 'rgba(0,0,0,0)',   // totalmente transparente
+        borderColor: 'rgba(0,0,0,0)',
+        pointBackgroundColor: 'rgba(0,0,0,0)',
+        pointBorderColor: 'rgba(0,0,0,0)',
+        pointHoverBackgroundColor: 'rgba(232,185,49,0.15)',
+        pointHoverBorderColor: '#E8B931',
+        pointHoverBorderWidth: 2,
       }]
     },
     options: {
@@ -199,13 +205,19 @@ async function montarGraficoDispersao(dados) {
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: 'rgba(11,61,46,0.95)',
+          backgroundColor: 'rgba(11,61,46,0.97)',
           titleColor: '#E8B931',
           bodyColor: '#F0F4ED',
-          borderColor: 'rgba(240,244,237,0.15)',
+          borderColor: 'rgba(232,185,49,0.4)',
           borderWidth: 1,
+          padding: 10,
           callbacks: {
-            label: item => ` ${item.raw.label} (Grupo ${item.raw.grupo})`
+            title: items => items[0].raw.label,
+            label: item => [
+              `Grupo ${item.raw.grupo}`,
+              `Ataque: ${item.raw.x.toFixed(2)}`,
+              `Defesa: ${(3 - item.raw.y).toFixed(2)}`
+            ]
           }
         }
       }
