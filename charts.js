@@ -268,4 +268,5 @@ async function iniciar() {
   montarTabela(dadosGlobais);
 }
 
+// Iniciado pelo index.html após Chart.js carregar
 iniciar();
