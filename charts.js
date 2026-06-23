@@ -54,36 +54,38 @@ function preCarregarBandeiras(times) {
 // ─── Plugin customizado para desenhar bandeiras no scatter ─────────────
 const pluginBandeiras = {
   id: 'bandeiras',
-  afterDatasetsDraw(chart) {
-    const { ctx, data, scales } = chart;
+  afterDraw(chart) {
+    const { ctx, data, scales, chartArea } = chart;
     if (!data.datasets[0]) return;
-    data.datasets[0].data.forEach((ponto, i) => {
+
+    // Salva e recorta dentro da área do gráfico para bandeiras não saírem dos eixos
+    ctx.save();
+    ctx.rect(chartArea.left, chartArea.top, chartArea.width, chartArea.height);
+    ctx.clip();
+
+    data.datasets[0].data.forEach((ponto) => {
       const x = scales.x.getPixelForValue(ponto.x);
       const y = scales.y.getPixelForValue(ponto.y);
       const img = imagensCache[ponto.label];
       if (img) {
-        const w = 32, h = 24;
-        ctx.save();
-        // sombra sutil
+        const w = 28, h = 21;
         ctx.shadowColor = 'rgba(0,0,0,0.5)';
-        ctx.shadowBlur = 4;
+        ctx.shadowBlur = 3;
         ctx.drawImage(img, x - w/2, y - h/2, w, h);
-        ctx.restore();
+        ctx.shadowBlur = 0;
       } else {
-        // fallback: círculo amarelo com inicial
-        ctx.save();
         ctx.fillStyle = '#E8B931';
         ctx.beginPath();
-        ctx.arc(x, y, 8, 0, Math.PI * 2);
+        ctx.arc(x, y, 7, 0, Math.PI * 2);
         ctx.fill();
         ctx.fillStyle = '#0B3D2E';
-        ctx.font = 'bold 8px sans-serif';
+        ctx.font = 'bold 7px sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText((ponto.label || '?')[0], x, y);
-        ctx.restore();
       }
     });
+    ctx.restore();
   }
 };
 
@@ -171,7 +173,7 @@ async function montarGraficoDispersao(dados) {
       datasets: [{
         label: 'Seleções',
         data: pontos,
-        pointRadius: 0,      // ocultamos o ponto padrão — o plugin desenha a bandeira
+        pointRadius: 0,
         pointHoverRadius: 0,
         backgroundColor: 'transparent'
       }]
@@ -179,15 +181,18 @@ async function montarGraficoDispersao(dados) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      layout: {
+        padding: { top: 20, right: 24, bottom: 8, left: 8 }
+      },
       scales: {
         x: {
           title: { display: true, text: 'Poder ofensivo →', color: 'rgba(240,244,237,0.5)', font: { size: 11 } },
-          ticks: { color: 'rgba(240,244,237,0.5)', font: { size: 10 } },
+          ticks: { color: 'rgba(240,244,237,0.7)', font: { size: 10 }, z: 10 },
           grid: { color: 'rgba(240,244,237,0.06)' }
         },
         y: {
           title: { display: true, text: 'Solidez defensiva →', color: 'rgba(240,244,237,0.5)', font: { size: 11 } },
-          ticks: { color: 'rgba(240,244,237,0.5)', font: { size: 10 } },
+          ticks: { color: 'rgba(240,244,237,0.7)', font: { size: 10 }, z: 10 },
           grid: { color: 'rgba(240,244,237,0.06)' }
         }
       },
@@ -316,10 +321,21 @@ function preencherFiltros(dados) {
 
   selGrupo.addEventListener('change', () => {
     const g = selGrupo.value;
+    // Mostrar/ocultar opções
     Array.from(selTimes.options).forEach(o => {
       const info = dados.times.find(t => t.time === o.value);
       o.hidden = g !== 'todos' && info && info.grupo !== g;
+      // Se filtrando por grupo, selecionar os 4 times desse grupo automaticamente
+      if (g !== 'todos') {
+        o.selected = info && info.grupo === g;
+      } else {
+        // "Todos" → seleciona os 4 primeiros
+        o.selected = Array.from(selTimes.options).indexOf(o) < 4;
+      }
     });
+    // Atualizar gráfico com os times agora selecionados
+    const sel = Array.from(selTimes.selectedOptions).map(o => o.value);
+    montarGraficoEvolucao(dadosGlobais, sel);
   });
 
   selTimes.addEventListener('change', () => {
