@@ -3,242 +3,363 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chaveamento Copa 2026</title>
+<title>Copa 2026 — Chaveamento</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background: #0B3D2E;
-  color: #F0F4ED;
+  background: #0f1923;
+  color: #e8edf2;
   font-family: 'Inter', -apple-system, sans-serif;
   min-height: 100vh;
-  padding: 24px 16px 48px;
+  padding: 0 0 60px;
 }
 
-h1 {
-  text-align: center;
-  font-size: 1.4rem;
+/* ── Header ── */
+.header {
+  background: linear-gradient(135deg, #0f1923 0%, #1a2d1f 100%);
+  border-bottom: 2px solid #E8B931;
+  padding: 20px 24px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.header h1 {
+  font-size: 1.3rem;
   color: #E8B931;
-  margin-bottom: 4px;
   font-family: Georgia, serif;
+  font-weight: 700;
 }
 
-.subtitulo {
-  text-align: center;
+.header-meta {
+  font-size: 0.75rem;
+  color: rgba(232,237,242,0.55);
+}
+
+.nav-link {
+  background: rgba(232,185,49,0.12);
+  color: #E8B931;
+  border: 1px solid rgba(232,185,49,0.3);
+  border-radius: 4px;
+  padding: 6px 14px;
   font-size: 0.8rem;
-  color: rgba(240,244,237,0.5);
-  margin-bottom: 24px;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.nav-link:hover { background: rgba(232,185,49,0.22); }
+
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid rgba(232,237,242,0.1);
+  padding: 0 24px;
+  background: #141e28;
 }
 
-/* ── Layout espelhado ── */
-.bracket-wrap {
+.tab {
+  padding: 12px 20px;
+  font-size: 0.82rem;
+  color: rgba(232,237,242,0.5);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.tab:hover { color: #e8edf2; }
+.tab.ativo { color: #E8B931; border-bottom-color: #E8B931; font-weight: 600; }
+
+.painel { display: none; padding: 24px; }
+.painel.ativo { display: block; }
+
+/* ── Classificação ── */
+.grupos-grid {
   display: grid;
-  grid-template-columns: repeat(9, 1fr);
-  grid-template-rows: auto;
-  gap: 0 4px;
-  min-width: 1100px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
 }
 
-.fase-titulo {
+.grupo-card {
+  background: #141e28;
+  border: 1px solid rgba(232,237,242,0.08);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.grupo-header {
+  background: rgba(232,185,49,0.12);
+  color: #E8B931;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(232,185,49,0.2);
+}
+
+.grupo-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.grupo-table th {
+  color: rgba(232,237,242,0.45);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  padding: 6px 8px;
+  text-align: center;
+  border-bottom: 1px solid rgba(232,237,242,0.06);
+}
+
+.grupo-table th:first-child { text-align: left; padding-left: 12px; }
+
+.grupo-table td {
+  padding: 7px 8px;
+  text-align: center;
+  border-bottom: 1px solid rgba(232,237,242,0.04);
+  color: #e8edf2;
+}
+
+.grupo-table td:first-child {
+  text-align: left;
+  padding-left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.grupo-table tr:last-child td { border-bottom: none; }
+.grupo-table tr:hover td { background: rgba(232,237,242,0.03); }
+
+.pos-badge {
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.pos-1 { background: #E8B931; color: #0f1923; }
+.pos-2 { background: #6FAE8C; color: #0f1923; }
+.pos-3 { background: rgba(232,237,242,0.15); color: #e8edf2; }
+.pos-4 { background: rgba(193,67,42,0.3); color: rgba(232,237,242,0.6); }
+
+/* ── Bracket ── */
+.bracket-scroll {
+  overflow-x: auto;
+  padding: 0 24px 16px;
+}
+
+.bracket-grid {
+  display: grid;
+  grid-template-columns: 180px 160px 130px 120px 140px 120px 130px 160px 180px;
+  gap: 0 6px;
+  min-width: 1300px;
+}
+
+.fase-col-titulo {
   font-size: 0.62rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: #E8B931;
   text-align: center;
-  padding: 0 0 10px;
+  padding: 12px 0 10px;
   font-weight: 700;
   grid-row: 1;
+  border-bottom: 1px solid rgba(232,185,49,0.2);
+  margin-bottom: 4px;
 }
 
-.col-slots {
+.col-jogos {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
   grid-row: 2;
+  padding: 4px 0;
 }
 
-/* Colunas no grid */
-.col-1  { grid-column: 1; }
-.col-2  { grid-column: 2; }
-.col-3  { grid-column: 3; }
-.col-4  { grid-column: 4; }
-.col-5  { grid-column: 5; } /* FINAL no centro */
-.col-6  { grid-column: 6; }
-.col-7  { grid-column: 7; }
-.col-8  { grid-column: 8; }
-.col-9  { grid-column: 9; }
-
-/* ── Cartão de confronto ── */
-.jogo {
-  background: rgba(240,244,237,0.04);
-  border: 1px solid rgba(240,244,237,0.1);
+/* ── Cartão de jogo ── */
+.jogo-card {
+  background: #141e28;
+  border: 1px solid rgba(232,237,242,0.1);
   border-radius: 5px;
-  padding: 6px 8px;
-  margin: 3px 2px;
-  font-size: 0.75rem;
+  padding: 7px 9px;
+  margin: 3px 0;
   cursor: default;
-  transition: border-color 0.15s, background 0.15s;
+  transition: border-color 0.15s;
   position: relative;
 }
-.jogo:hover { border-color: #E8B931; background: rgba(232,185,49,0.06); }
 
-.jogo-id {
+.jogo-card:hover { border-color: rgba(232,185,49,0.5); }
+
+.jogo-num {
   font-size: 0.58rem;
-  color: rgba(240,244,237,0.3);
+  color: rgba(232,237,242,0.3);
   text-align: right;
-  margin-bottom: 3px;
-  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+  letter-spacing: 0.04em;
 }
 
-.time-linha {
+.time-row {
   display: flex;
   align-items: center;
   gap: 5px;
-  padding: 3px 0;
+  padding: 2px 0;
+}
+
+.time-row img { flex-shrink: 0; border-radius: 1px; }
+
+.time-txt {
+  font-size: 0.76rem;
+  color: #c8d4de;
+  flex: 1;
   white-space: nowrap;
   overflow: hidden;
-}
-
-.time-nome {
-  font-size: 0.73rem;
-  overflow: hidden;
   text-overflow: ellipsis;
-  flex: 1;
 }
 
-.time-nome.vencedor { color: #E8B931; font-weight: 600; }
-.time-nome.eliminado { color: rgba(240,244,237,0.3); text-decoration: line-through; }
-.time-nome.pendente { color: rgba(240,244,237,0.35); font-style: italic; font-size: 0.67rem; }
+.time-txt.vencedor { color: #E8B931; font-weight: 700; }
+.time-txt.eliminado { color: rgba(232,237,242,0.3); text-decoration: line-through; }
+.time-txt.slot { color: rgba(232,237,242,0.3); font-style: italic; font-size: 0.67rem; }
 
-.placar {
-  font-size: 0.72rem;
-  color: #E8B931;
+.placar-num {
+  font-size: 0.75rem;
   font-weight: 700;
+  color: #E8B931;
   min-width: 14px;
   text-align: right;
-  font-variant-numeric: tabular-nums;
 }
 
+/* barra de prob */
+.prob-wrap { margin-top: 5px; }
 .prob-bar {
-  margin-top: 5px;
-  height: 4px;
+  height: 3px;
   border-radius: 2px;
-  overflow: hidden;
   display: flex;
-  background: rgba(240,244,237,0.06);
+  overflow: hidden;
+  background: rgba(232,237,242,0.06);
 }
+.pb-a { height: 100%; }
+.pb-b { height: 100%; }
 
-.prob-fill-a { height: 100%; }
-.prob-fill-b { height: 100%; }
-
-.prob-txt {
+.prob-nums {
   display: flex;
   justify-content: space-between;
-  font-size: 0.6rem;
-  color: rgba(240,244,237,0.35);
+  font-size: 0.59rem;
+  color: rgba(232,237,242,0.35);
   margin-top: 2px;
 }
 
-.jogo-vazio {
-  background: rgba(240,244,237,0.015);
-  border: 1px dashed rgba(240,244,237,0.07);
-  border-radius: 5px;
-  padding: 6px 8px;
-  margin: 3px 2px;
-  min-height: 60px;
-}
-
-/* ── FINAL no centro ── */
-.final-wrap {
+/* FINAL */
+.final-col {
+  grid-column: 5;
+  grid-row: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  grid-row: 2;
-  grid-column: 5;
-  gap: 8px;
+  padding: 0 4px;
+  gap: 6px;
 }
 
+.trofeu { font-size: 2rem; text-align: center; }
+
 .final-titulo {
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.12em;
   color: #E8B931;
   font-weight: 700;
   text-align: center;
 }
 
-.trofeu {
-  font-size: 2.2rem;
-  text-align: center;
-  margin: 4px 0;
-}
-
-/* ── Tooltip ── */
+/* tooltip */
 .tt {
   display: none;
   position: absolute;
-  z-index: 50;
+  z-index: 60;
   left: 105%;
   top: 0;
-  background: rgba(11,61,46,0.98);
-  border: 1px solid rgba(232,185,49,0.45);
+  background: #0f1923;
+  border: 1px solid rgba(232,185,49,0.4);
   border-radius: 4px;
   padding: 10px 14px;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   white-space: nowrap;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
-  min-width: 200px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+  min-width: 210px;
+  color: #e8edf2;
 }
-.jogo:hover .tt { display: block; }
+.jogo-card:hover .tt { display: block; }
 
-/* ── Scroll wrapper ── */
-.scroll {
-  overflow-x: auto;
-  padding-bottom: 12px;
-}
-
-.legenda {
-  text-align: center;
-  font-size: 0.72rem;
-  color: rgba(240,244,237,0.4);
-  margin-top: 20px;
-}
-
-@media (max-width: 768px) {
-  body { padding: 16px 8px 32px; }
-  .bracket-wrap { min-width: 900px; }
+.vazio {
+  background: rgba(232,237,242,0.015);
+  border: 1px dashed rgba(232,237,242,0.06);
+  border-radius: 5px;
+  padding: 7px 9px;
+  margin: 3px 0;
+  min-height: 62px;
+  opacity: 0.5;
 }
 </style>
 </head>
 <body>
 
-<h1>Chaveamento Copa do Mundo 2026</h1>
-<p class="subtitulo" id="atualizado">Carregando dados...</p>
+<div class="header">
+  <div>
+    <h1>⚽ Copa do Mundo 2026</h1>
+    <div class="header-meta" id="meta">Carregando...</div>
+  </div>
+  <a class="nav-link" href="index.html">← Dashboard</a>
+</div>
 
-<div class="scroll">
-  <div class="bracket-wrap" id="bracket">
-    <div style="grid-column:1;grid-row:1" class="fase-titulo">16-avos</div>
-    <div style="grid-column:2;grid-row:1" class="fase-titulo">Oitavas</div>
-    <div style="grid-column:3;grid-row:1" class="fase-titulo">Quartas</div>
-    <div style="grid-column:4;grid-row:1" class="fase-titulo">Semifinal</div>
-    <div style="grid-column:5;grid-row:1" class="fase-titulo">Final</div>
-    <div style="grid-column:6;grid-row:1" class="fase-titulo">Semifinal</div>
-    <div style="grid-column:7;grid-row:1" class="fase-titulo">Quartas</div>
-    <div style="grid-column:8;grid-row:1" class="fase-titulo">Oitavas</div>
-    <div style="grid-column:9;grid-row:1" class="fase-titulo">16-avos</div>
+<div class="tabs">
+  <div class="tab ativo" data-tab="bracket">🏆 Chaveamento</div>
+  <div class="tab" data-tab="grupos">📊 Classificação</div>
+</div>
+
+<div id="tab-bracket" class="painel ativo">
+  <div class="bracket-scroll">
+    <div class="bracket-grid" id="bracket-grid">
+      <div style="grid-column:1;grid-row:1" class="fase-col-titulo">16-avos</div>
+      <div style="grid-column:2;grid-row:1" class="fase-col-titulo">Oitavas</div>
+      <div style="grid-column:3;grid-row:1" class="fase-col-titulo">Quartas</div>
+      <div style="grid-column:4;grid-row:1" class="fase-col-titulo">Semifinal</div>
+      <div style="grid-column:5;grid-row:1" class="fase-col-titulo">Final</div>
+      <div style="grid-column:6;grid-row:1" class="fase-col-titulo">Semifinal</div>
+      <div style="grid-column:7;grid-row:1" class="fase-col-titulo">Quartas</div>
+      <div style="grid-column:8;grid-row:1" class="fase-col-titulo">Oitavas</div>
+      <div style="grid-column:9;grid-row:1" class="fase-col-titulo">16-avos</div>
+    </div>
   </div>
 </div>
 
-<div class="legenda">
-  Probabilidades calculadas pelo modelo zero-prior (Elo + Ataque/Defesa) · Dados: API-Football
+<div id="tab-grupos" class="painel">
+  <div class="grupos-grid" id="grupos-grid"></div>
 </div>
 
 <script src="data-loader.js"></script>
 <script>
-const APPS_SCRIPT_URL_BRACKET = typeof APPS_SCRIPT_URL !== 'undefined' ? APPS_SCRIPT_URL : '';
+// ── Tabs ──
+document.querySelectorAll('.tab').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('ativo'); });
+    document.querySelectorAll('.painel').forEach(function(p){ p.classList.remove('ativo'); });
+    tab.classList.add('ativo');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('ativo');
+  });
+});
 
-// ── ISO bandeiras ──
+// ── Dados ──
 const FLAG_ISO = {
   'México':'mx','Coreia do Sul':'kr','República Tcheca':'cz','África do Sul':'za',
   'Bósnia e Herzegovina':'ba','Canadá':'ca','Catar':'qa','Suíça':'ch',
@@ -260,172 +381,226 @@ const COR_GRUPO = {
   'I':'#8BAE3E','J':'#C77DD1','K':'#E8D031','L':'#5FAEAE'
 };
 
-// ── Chaveamento oficial FIFA Copa 2026 ──
-// Lado esquerdo (colunas 1-4) + Lado direito (colunas 9-6)
-const LADO_ESQ = {
-  '16avos': [
-    { id:'J74', a:'1º Grupo E', b:'3º A/B/C/D/F', data:'29/06' },
-    { id:'J77', a:'1º Grupo I', b:'3º C/D/F/G/H', data:'30/06' },
-    { id:'J73', a:'2º Grupo A', b:'2º Grupo B',   data:'28/06' },
-    { id:'J75', a:'1º Grupo F', b:'2º Grupo C',   data:'30/06' },
-    { id:'J83', a:'2º Grupo K', b:'2º Grupo L',   data:'02/07' },
-    { id:'J84', a:'1º Grupo H', b:'2º Grupo J',   data:'02/07' },
-    { id:'J81', a:'1º Grupo D', b:'3º B/E/F/I/J', data:'02/07' },
-    { id:'J82', a:'1º Grupo G', b:'3º A/E/H/I/J', data:'01/07' },
-  ],
-  'oitavas': [
-    { id:'J89', a:'Venc. J74', b:'Venc. J77', data:'04/07' },
-    { id:'J90', a:'Venc. J73', b:'Venc. J75', data:'04/07' },
-    { id:'J93', a:'Venc. J83', b:'Venc. J84', data:'06/07' },
-    { id:'J94', a:'Venc. J81', b:'Venc. J82', data:'06/07' },
-  ],
-  'quartas': [
-    { id:'J97', a:'Venc. J89', b:'Venc. J90', data:'09/07' },
-    { id:'J98', a:'Venc. J93', b:'Venc. J94', data:'10/07' },
-  ],
-  'semi': [
-    { id:'J101', a:'Venc. J97', b:'Venc. J98', data:'14/07' },
-  ],
-};
+// Chaveamento oficial FIFA
+const ESQ_16 = [
+  {id:'J74',a:'1E',b:'3ABCDF',data:'29/06'},
+  {id:'J77',a:'1I',b:'3CDFGH',data:'30/06'},
+  {id:'J73',a:'2A',b:'2B',    data:'28/06'},
+  {id:'J75',a:'1F',b:'2C',    data:'30/06'},
+  {id:'J83',a:'2K',b:'2L',    data:'02/07'},
+  {id:'J84',a:'1H',b:'2J',    data:'02/07'},
+  {id:'J81',a:'1D',b:'3BEFIJ',data:'02/07'},
+  {id:'J82',a:'1G',b:'3AEHIJ',data:'01/07'},
+];
+const ESQ_8 = [
+  {id:'J89',a:'WJ74',b:'WJ77',data:'04/07'},
+  {id:'J90',a:'WJ73',b:'WJ75',data:'04/07'},
+  {id:'J93',a:'WJ83',b:'WJ84',data:'06/07'},
+  {id:'J94',a:'WJ81',b:'WJ82',data:'06/07'},
+];
+const ESQ_4 = [
+  {id:'J97',a:'WJ89',b:'WJ90',data:'09/07'},
+  {id:'J98',a:'WJ93',b:'WJ94',data:'10/07'},
+];
+const ESQ_SEMI = [{id:'J101',a:'WJ97',b:'WJ98',data:'14/07'}];
 
-const LADO_DIR = {
-  '16avos': [
-    { id:'J76', a:'1º Grupo C', b:'2º Grupo F',   data:'29/06' },
-    { id:'J78', a:'2º Grupo E', b:'2º Grupo I',   data:'30/06' },
-    { id:'J79', a:'1º Grupo A', b:'3º C/E/F/H/I', data:'01/07' },
-    { id:'J80', a:'1º Grupo L', b:'3º E/H/I/J/K', data:'01/07' },
-    { id:'J86', a:'1º Grupo J', b:'2º Grupo H',   data:'03/07' },
-    { id:'J88', a:'2º Grupo D', b:'2º Grupo G',   data:'03/07' },
-    { id:'J85', a:'1º Grupo B', b:'3º E/F/G/I/J', data:'03/07' },
-    { id:'J87', a:'1º Grupo K', b:'3º D/E/I/J/L', data:'04/07' },
-  ],
-  'oitavas': [
-    { id:'J91', a:'Venc. J76', b:'Venc. J78', data:'05/07' },
-    { id:'J92', a:'Venc. J79', b:'Venc. J80', data:'05/07' },
-    { id:'J95', a:'Venc. J86', b:'Venc. J88', data:'07/07' },
-    { id:'J96', a:'Venc. J85', b:'Venc. J87', data:'07/07' },
-  ],
-  'quartas': [
-    { id:'J99',  a:'Venc. J91', b:'Venc. J92', data:'11/07' },
-    { id:'J100', a:'Venc. J95', b:'Venc. J96', data:'11/07' },
-  ],
-  'semi': [
-    { id:'J102', a:'Venc. J99', b:'Venc. J100', data:'15/07' },
-  ],
-};
+const DIR_16 = [
+  {id:'J76',a:'1C',b:'2F',    data:'29/06'},
+  {id:'J78',a:'2E',b:'2I',    data:'30/06'},
+  {id:'J79',a:'1A',b:'3CEFHI',data:'01/07'},
+  {id:'J80',a:'1L',b:'3EHIJK',data:'01/07'},
+  {id:'J86',a:'1J',b:'2H',    data:'03/07'},
+  {id:'J88',a:'2D',b:'2G',    data:'03/07'},
+  {id:'J85',a:'1B',b:'3EFGIJ',data:'03/07'},
+  {id:'J87',a:'1K',b:'3DEIJL',data:'04/07'},
+];
+const DIR_8 = [
+  {id:'J91',a:'WJ76',b:'WJ78',data:'05/07'},
+  {id:'J92',a:'WJ79',b:'WJ80',data:'05/07'},
+  {id:'J95',a:'WJ86',b:'WJ88',data:'07/07'},
+  {id:'J96',a:'WJ85',b:'WJ87',data:'07/07'},
+];
+const DIR_4 = [
+  {id:'J99', a:'WJ91',b:'WJ92',data:'11/07'},
+  {id:'J100',a:'WJ95',b:'WJ96',data:'11/07'},
+];
+const DIR_SEMI = [{id:'J102',a:'WJ99',b:'WJ100',data:'15/07'}];
+const FINAL   =  {id:'J104',a:'WJ101',b:'WJ102',data:'19/07'};
 
-const FINAL = { id:'J104', a:'Venc. J101', b:'Venc. J102', data:'19/07' };
+// ── Resolver slot ──
+function resolverSlot(slot, posicoes, resultados) {
+  if (!slot) return null;
+  // 1º/2º grupo: ex "1E" → posicoes['1E']
+  if (/^[12][A-L]$/.test(slot)) return posicoes[slot] || null;
+  // 3º colocado: ex "3ABCDF"
+  if (/^3[A-L]+$/.test(slot)) return null; // depende de quais 3ºs passam
+  // Vencedor de jogo: ex "WJ74"
+  if (/^WJ\d+$/.test(slot)) {
+    var jId = slot.slice(1); // "J74"
+    var r = resultados[jId];
+    return r && r.vencedor ? r.vencedor : null;
+  }
+  return null;
+}
 
-// ── Utilitários ──
 function flag(nome) {
-  const iso = FLAG_ISO[nome];
-  return iso ? `<img src="https://flagcdn.com/16x12/${iso}.png" style="vertical-align:middle;flex-shrink:0;">` : '<span style="width:16px;display:inline-block;"></span>';
+  if (!nome) return '<span style="width:20px;display:inline-block;flex-shrink:0;"></span>';
+  var iso = FLAG_ISO[nome];
+  return iso
+    ? '<img src="https://flagcdn.com/20x15/'+iso+'.png" style="flex-shrink:0;border-radius:1px;">'
+    : '<span style="width:20px;display:inline-block;flex-shrink:0;"></span>';
 }
 
 function calcProb(dados, nA, nB) {
-  const tA = dados.times.find(t => t.time === nA);
-  const tB = dados.times.find(t => t.time === nB);
+  var tA = dados.times.find(function(t){return t.time===nA;});
+  var tB = dados.times.find(function(t){return t.time===nB;});
   if (!tA || !tB) return null;
-  const gA = (parseFloat(tA.ataque) + parseFloat(tB.defesa)) / 2;
-  const gB = (parseFloat(tB.ataque) + parseFloat(tA.defesa)) / 2;
-  const pA = 1 / (1 + Math.exp(-1.3 * (gA - gB)));
-  return { pA, pB: 1-pA, gA, gB };
+  var gA = (parseFloat(tA.ataque)+parseFloat(tB.defesa))/2;
+  var gB = (parseFloat(tB.ataque)+parseFloat(tA.defesa))/2;
+  var pA = 1/(1+Math.exp(-1.3*(gA-gB)));
+  return {pA:pA,pB:1-pA,gA:gA,gB:gB};
 }
 
-function renderTime(dados, slot, placar, isVencedor, isEliminado) {
-  const t = dados.times.find(x => x.time === slot);
-  const cls = isVencedor ? 'vencedor' : isEliminado ? 'eliminado' : t ? '' : 'pendente';
-  const nome = t ? slot : `<em>${slot}</em>`;
-  const fg = t ? flag(slot) : '<span style="width:16px;display:inline-block;"></span>';
-  const placarHtml = (placar !== undefined && placar !== null && placar !== '')
-    ? `<span class="placar">${placar}</span>` : '';
-  return `<div class="time-linha">${fg}<span class="time-nome ${cls}">${nome}</span>${placarHtml}</div>`;
-}
+function criarCard(dados, jogo) {
+  var posicoes   = dados.posicoes   || {};
+  var resultados = dados.resultadosMM || {};
 
-function criarJogo(dados, jogo, invertido) {
-  const div = document.createElement('div');
-  div.className = 'jogo';
+  var nA = resolverSlot(jogo.a, posicoes, resultados);
+  var nB = resolverSlot(jogo.b, posicoes, resultados);
 
-  const tA = dados.times.find(x => x.time === jogo.a);
-  const tB = dados.times.find(x => x.time === jogo.b);
-  const prob = tA && tB ? calcProb(dados, jogo.a, jogo.b) : null;
+  var res = resultados[jogo.id];
+  var vencedor = res ? res.vencedor : null;
+  var gA = res ? res.gA : null;
+  var gB = res ? res.gB : null;
 
-  const corA = tA ? (COR_GRUPO[tA.grupo] || '#E8B931') : '#E8B931';
-  const corB = tB ? (COR_GRUPO[tB.grupo] || '#7CA8C9') : '#7CA8C9';
+  var tA = nA ? dados.times.find(function(t){return t.time===nA;}) : null;
+  var tB = nB ? dados.times.find(function(t){return t.time===nB;}) : null;
+  var prob = nA && nB && !res ? calcProb(dados, nA, nB) : null;
 
-  const nA = renderTime(dados, jogo.a, jogo.golsA, jogo.vencedor === jogo.a, jogo.vencedor && jogo.vencedor !== jogo.a);
-  const nB = renderTime(dados, jogo.b, jogo.golsB, jogo.vencedor === jogo.b, jogo.vencedor && jogo.vencedor !== jogo.b);
+  var corA = tA ? (COR_GRUPO[tA.grupo]||'#E8B931') : '#555';
+  var corB = tB ? (COR_GRUPO[tB.grupo]||'#7CA8C9') : '#333';
 
-  let probHtml = '';
-  if (prob) {
-    const pA = Math.round(prob.pA * 100);
-    probHtml = `
-      <div class="prob-bar">
-        <div class="prob-fill-a" style="width:${pA}%;background:${corA};opacity:0.7;"></div>
-        <div class="prob-fill-b" style="flex:1;background:${corB};opacity:0.7;"></div>
-      </div>
-      <div class="prob-txt"><span>${pA}%</span><span>${jogo.data}</span><span>${100-pA}%</span></div>
-    `;
-  } else {
-    probHtml = `<div class="prob-txt" style="justify-content:center;margin-top:4px;">${jogo.data}</div>`;
+  function linha(nome, gols, isVenc, isElim, slotOrig) {
+    var cls = isVenc ? 'vencedor' : isElim ? 'eliminado' : nome ? '' : 'slot';
+    var txt = nome || '<em>'+slotOrig+'</em>';
+    var pl = (gols !== null && gols !== undefined) ? '<span class="placar-num">'+gols+'</span>' : '';
+    return '<div class="time-row">'+flag(nome)+'<span class="time-txt '+cls+'">'+txt+'</span>'+pl+'</div>';
   }
 
-  const ttHtml = prob ? `
-    <div class="tt">
-      <div style="color:#E8B931;font-weight:700;margin-bottom:6px">${jogo.id} · ${jogo.data}</div>
-      <div>${jogo.a}: <b>${Math.round(prob.pA*100)}%</b> · ${prob.gA.toFixed(2)} gols esp.</div>
-      <div>${jogo.b}: <b>${Math.round(prob.pB*100)}%</b> · ${prob.gB.toFixed(2)} gols esp.</div>
-    </div>` : '';
+  var htmlA = linha(nA, gA, vencedor===nA, vencedor&&vencedor!==nA&&nA, jogo.a);
+  var htmlB = linha(nB, gB, vencedor===nB, vencedor&&vencedor!==nB&&nB, jogo.b);
 
-  div.innerHTML = `<div class="jogo-id">${jogo.id}</div>${nA}${nB}${probHtml}${ttHtml}`;
+  var probHtml = '';
+  if (prob) {
+    var pA = Math.round(prob.pA*100);
+    probHtml = '<div class="prob-wrap"><div class="prob-bar">'
+      +'<div class="pb-a" style="width:'+pA+'%;background:'+corA+';opacity:0.75;"></div>'
+      +'<div class="pb-b" style="flex:1;background:'+corB+';opacity:0.75;"></div>'
+      +'</div><div class="prob-nums"><span>'+pA+'%</span><span>'+jogo.data+'</span><span>'+(100-pA)+'%</span></div></div>';
+  } else {
+    probHtml = '<div class="prob-nums" style="justify-content:center;margin-top:4px;">'+jogo.data+'</div>';
+  }
+
+  var ttHtml = '';
+  if (prob && nA && nB) {
+    ttHtml = '<div class="tt">'
+      +'<div style="color:#E8B931;font-weight:700;margin-bottom:6px">'+jogo.id+' · '+jogo.data+'</div>'
+      +'<div style="margin-bottom:3px">'+nA+': <b>'+Math.round(prob.pA*100)+'%</b> &nbsp;('+prob.gA.toFixed(2)+' gols esp.)</div>'
+      +'<div>'+nB+': <b>'+Math.round(prob.pB*100)+'%</b> &nbsp;('+prob.gB.toFixed(2)+' gols esp.)</div>'
+      +'</div>';
+  }
+
+  var div = document.createElement('div');
+  div.className = 'jogo-card';
+  div.innerHTML = '<div class="jogo-num">'+jogo.id+'</div>'+htmlA+htmlB+probHtml+ttHtml;
   return div;
 }
 
-function criarColuna(dados, jogos, gridCol, gridRow) {
-  const col = document.createElement('div');
-  col.className = 'col-slots';
+function criarColuna(dados, jogos, gridCol) {
+  var col = document.createElement('div');
+  col.className = 'col-jogos';
   col.style.gridColumn = gridCol;
-  col.style.gridRow = gridRow || '2';
-  jogos.forEach(j => col.appendChild(criarJogo(dados, j)));
+  col.style.gridRow = '2';
+  jogos.forEach(function(j){ col.appendChild(criarCard(dados, j)); });
   return col;
 }
 
 function montarBracket(dados) {
-  const bracket = document.getElementById('bracket');
+  var grid = document.getElementById('bracket-grid');
+  grid.querySelectorAll('.col-jogos, .final-col').forEach(function(el){ el.remove(); });
 
-  // Remover colunas antigas (mantém cabeçalhos na row 1)
-  bracket.querySelectorAll('.col-slots, .final-wrap').forEach(el => el.remove());
+  grid.appendChild(criarColuna(dados, ESQ_16,   1));
+  grid.appendChild(criarColuna(dados, ESQ_8,    2));
+  grid.appendChild(criarColuna(dados, ESQ_4,    3));
+  grid.appendChild(criarColuna(dados, ESQ_SEMI, 4));
 
-  // ── Lado esquerdo ──
-  bracket.appendChild(criarColuna(dados, LADO_ESQ['16avos'], 1));
-  bracket.appendChild(criarColuna(dados, LADO_ESQ['oitavas'], 2));
-  bracket.appendChild(criarColuna(dados, LADO_ESQ['quartas'], 3));
-  bracket.appendChild(criarColuna(dados, LADO_ESQ['semi'], 4));
+  // FINAL
+  var fc = document.createElement('div');
+  fc.className = 'final-col';
+  fc.style.gridRow = '2';
+  fc.innerHTML = '<div class="trofeu">🏆</div><div class="final-titulo">Final · 19/07</div>';
+  fc.appendChild(criarCard(dados, FINAL));
+  grid.appendChild(fc);
 
-  // ── FINAL no centro ──
-  const finalWrap = document.createElement('div');
-  finalWrap.className = 'final-wrap';
-  finalWrap.style.gridRow = '2';
-  finalWrap.innerHTML = '<div class="trofeu">🏆</div><div class="final-titulo">Final · 19/07</div>';
-  finalWrap.appendChild(criarJogo(dados, FINAL));
-  bracket.appendChild(finalWrap);
-
-  // ── Lado direito (invertido) ──
-  bracket.appendChild(criarColuna(dados, LADO_DIR['semi'], 6));
-  bracket.appendChild(criarColuna(dados, LADO_DIR['quartas'], 7));
-  bracket.appendChild(criarColuna(dados, LADO_DIR['oitavas'], 8));
-  bracket.appendChild(criarColuna(dados, LADO_DIR['16avos'], 9));
-
-  // Atualizar subtítulo
-  const d = new Date(dados.atualizadoEm);
-  document.getElementById('atualizado').textContent =
-    'Atualizado em ' + d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'}) +
-    ' · ' + dados.times.length + ' seleções · Modelo zero-prior';
+  grid.appendChild(criarColuna(dados, DIR_SEMI, 6));
+  grid.appendChild(criarColuna(dados, DIR_4,    7));
+  grid.appendChild(criarColuna(dados, DIR_8,    8));
+  grid.appendChild(criarColuna(dados, DIR_16,   9));
 }
 
-// ── Iniciar ──
-carregarDados().then(dados => {
+// ── Classificação ──
+function montarClassificacao(dados) {
+  var container = document.getElementById('grupos-grid');
+  container.innerHTML = '';
+  var pos = dados.posicoes || {};
+
+  var grupos = {};
+  dados.times.forEach(function(t) {
+    if (!grupos[t.grupo]) grupos[t.grupo] = [];
+    grupos[t.grupo].push(t);
+  });
+
+  Object.keys(grupos).sort().forEach(function(g) {
+    var lista = grupos[g].slice().sort(function(a,b){
+      // ordenar por rating (proxy de desempenho)
+      return b.rating - a.rating;
+    });
+
+    var card = document.createElement('div');
+    card.className = 'grupo-card';
+
+    var rows = lista.map(function(t, i) {
+      var iso = FLAG_ISO[t.time];
+      var fg = iso ? '<img src="https://flagcdn.com/16x12/'+iso+'.png" style="vertical-align:middle;border-radius:1px;">' : '';
+      var posCls = 'pos-'+(i+1);
+      var classificado = i < 2 ? '✓' : '';
+      var corClass = i < 2 ? 'color:#6FAE8C;' : i === 2 ? 'color:rgba(232,237,242,0.5);' : 'color:rgba(232,237,242,0.3);';
+      return '<tr>'
+        +'<td><span class="pos-badge '+posCls+'">'+(i+1)+'</span>'+fg+' '+t.time+'</td>'
+        +'<td style="'+corClass+'font-size:0.68rem;">'+classificado+'</td>'
+        +'<td>'+Math.round(t.rating)+'</td>'
+        +'<td>'+parseFloat(t.ataque).toFixed(2)+'</td>'
+        +'<td>'+parseFloat(t.defesa).toFixed(2)+'</td>'
+        +'</tr>';
+    }).join('');
+
+    card.innerHTML = '<div class="grupo-header">Grupo '+g+'</div>'
+      +'<table class="grupo-table">'
+      +'<thead><tr><th>Seleção</th><th>MM</th><th>Rating</th><th>Atq</th><th>Def</th></tr></thead>'
+      +'<tbody>'+rows+'</tbody></table>';
+
+    container.appendChild(card);
+  });
+}
+
+// ── Init ──
+carregarDados().then(function(dados) {
+  var d = new Date(dados.atualizadoEm);
+  document.getElementById('meta').textContent =
+    'Atualizado ' + d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})
+    + ' · Modelo zero-prior';
   montarBracket(dados);
+  montarClassificacao(dados);
 });
 </script>
 </body>
