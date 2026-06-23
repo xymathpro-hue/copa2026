@@ -307,7 +307,134 @@ function montarTabela(dados) {
   }).join('');
 }
 
-// ─── Filtros ──────────────────────────────────────────────────────────
+// ─── 05 Mata-mata — bracket com chaveamento oficial ───────────────────
+
+// Chaveamento fixo dos 16-avos (1º × 2º de grupos fixos)
+// Fonte: regulamento oficial FIFA Copa 2026
+const CHAVEAMENTO_16AVOS = [
+  { id:'M1',  timeA:'1º Grupo A', timeB:'2º Grupo B', data:'28/06' },
+  { id:'M2',  timeA:'1º Grupo C', timeB:'2º Grupo F', data:'29/06' },
+  { id:'M3',  timeA:'1º Grupo E', timeB:'3º (A/B/C/D/F)', data:'29/06' },
+  { id:'M4',  timeA:'1º Grupo F', timeB:'2º Grupo C', data:'29/06' },
+  { id:'M5',  timeA:'2º Grupo E', timeB:'2º Grupo I', data:'30/06' },
+  { id:'M6',  timeA:'1º Grupo I', timeB:'3º (C/D/F/G/H)', data:'30/06' },
+  { id:'M7',  timeA:'1º Grupo A', timeB:'3º (C/E/F/H/I)', data:'01/07' },
+  { id:'M8',  timeA:'1º Grupo L', timeB:'3º (E/H/I/J/K)', data:'01/07' },
+  { id:'M9',  timeA:'1º Grupo G', timeB:'3º (A/E/H/I/J)', data:'01/07' },
+  { id:'M10', timeA:'1º Grupo D', timeB:'3º (B/E/F/I/J)', data:'02/07' },
+  { id:'M11', timeA:'1º Grupo H', timeB:'2º Grupo J', data:'02/07' },
+  { id:'M12', timeA:'2º Grupo K', timeB:'2º Grupo L', data:'03/07' },
+  { id:'M13', timeA:'1º Grupo B', timeB:'3º (E/F/G/I/J)', data:'03/07' },
+  { id:'M14', timeA:'2º Grupo D', timeB:'2º Grupo G', data:'03/07' },
+  { id:'M15', timeA:'1º Grupo J', timeB:'2º Grupo H', data:'03/07' },
+  { id:'M16', timeA:'1º Grupo K', timeB:'3º (D/E/I/J/L)', data:'03/07' },
+];
+
+// Calcula probabilidade de vitória do timeA vs timeB usando modelo Poisson simplificado
+function calcProb(dados, nomeA, nomeB) {
+  const tA = dados.times.find(t => t.time === nomeA);
+  const tB = dados.times.find(t => t.time === nomeB);
+  if (!tA || !tB) return null;
+  const golesEspA = (parseFloat(tA.ataque) + parseFloat(tB.defesa)) / 2;
+  const golesEspB = (parseFloat(tB.ataque) + parseFloat(tA.defesa)) / 2;
+  // Probabilidade via diferença de gols esperados (função logística)
+  const diff = golesEspA - golesEspB;
+  const probA = 1 / (1 + Math.exp(-1.3 * diff));
+  return { probA: probA, probB: 1 - probA, golesEspA, golesEspB };
+}
+
+// Busca time classificado em determinada posição/grupo
+function buscarClassificado(dados, slot) {
+  // slot ex: "1º Grupo C" ou "2º Grupo F"
+  if (!slot || slot.includes('3º') || slot.includes('Venc.') || slot.includes('Perd.')) return null;
+  const match = slot.match(/^([12])º Grupo ([A-L])$/);
+  if (!match) return null;
+  const pos = parseInt(match[1]);
+  const grupo = match[2];
+  // Buscar na classificação (aba Times tem grupo mas não posição — usamos o ranking implícito)
+  // Por ora retornamos o slot como texto
+  return null; // será preenchido quando a API retornar classificados
+}
+
+function montarBracket(dados) {
+  const container = document.getElementById('bracket-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const bracket = document.createElement('div');
+  bracket.className = 'bracket';
+
+  // Fase 16-avos
+  const fase16 = document.createElement('div');
+  fase16.className = 'bracket-fase';
+  fase16.innerHTML = '<div class="bracket-fase-titulo">16-avos · 28/06–03/07</div>';
+  const slots16 = document.createElement('div');
+  slots16.className = 'bracket-slots';
+
+  CHAVEAMENTO_16AVOS.forEach(jogo => {
+    const div = document.createElement('div');
+    div.className = 'confronto';
+
+    // Tentar encontrar times reais (da API)
+    const tA = dados.times.find(t => t.time === jogo.timeA);
+    const tB = dados.times.find(t => t.time === jogo.timeB);
+    const prob = tA && tB ? calcProb(dados, jogo.timeA, jogo.timeB) : null;
+
+    const isoA = tA ? (FLAG_ISO[tA.time] || '') : '';
+    const isoB = tB ? (FLAG_ISO[tB.time] || '') : '';
+    const flagA = isoA ? `<img src="https://flagcdn.com/16x12/${isoA}.png" style="vertical-align:middle;">` : '🏳️';
+    const flagB = isoB ? `<img src="https://flagcdn.com/16x12/${isoB}.png" style="vertical-align:middle;">` : '🏳️';
+
+    const nomeA = tA ? tA.time : `<span class="slot-vazio">${jogo.timeA}</span>`;
+    const nomeB = tB ? tB.time : `<span class="slot-vazio">${jogo.timeB}</span>`;
+
+    const probTexto = prob
+      ? `${Math.round(prob.probA * 100)}% · ${Math.round(prob.probB * 100)}%`
+      : '—';
+
+    div.innerHTML = `
+      <div class="confronto-time">${flagA} ${nomeA}</div>
+      <div class="confronto-time">${flagB} ${nomeB}</div>
+      <div class="confronto-prob">${probTexto} · ${jogo.data}</div>
+      ${prob ? `
+      <div class="confronto-tooltip">
+        <div style="color:#E8B931;font-weight:600;margin-bottom:6px">${jogo.id} · ${jogo.data}</div>
+        <div>${jogo.timeA}: <b>${Math.round(prob.probA * 100)}%</b> (${prob.golesEspA.toFixed(2)} gols esp.)</div>
+        <div>${jogo.timeB}: <b>${Math.round(prob.probB * 100)}%</b> (${prob.golesEspB.toFixed(2)} gols esp.)</div>
+      </div>` : ''}
+    `;
+    slots16.appendChild(div);
+  });
+
+  fase16.appendChild(slots16);
+  bracket.appendChild(fase16);
+
+  // Fases posteriores (slots vazios por enquanto)
+  const fases = ['Oitavas · 04–07/07','Quartas · 09–11/07','Semifinal · 14–15/07','Final · 19/07'];
+  const jogos = [8, 4, 2, 1];
+  fases.forEach((nome, fi) => {
+    const fase = document.createElement('div');
+    fase.className = 'bracket-fase';
+    fase.innerHTML = `<div class="bracket-fase-titulo">${nome}</div>`;
+    const slots = document.createElement('div');
+    slots.className = 'bracket-slots';
+    for (let i = 0; i < jogos[fi]; i++) {
+      const div = document.createElement('div');
+      div.className = 'confronto';
+      div.innerHTML = `
+        <div class="confronto-time"><span class="slot-vazio">A definir</span></div>
+        <div class="confronto-time"><span class="slot-vazio">A definir</span></div>
+        <div class="confronto-prob">—</div>
+      `;
+      slots.appendChild(div);
+    }
+    fase.appendChild(slots);
+    bracket.appendChild(fase);
+  });
+
+  container.appendChild(bracket);
+  document.getElementById('bracket-loading')?.remove();
+}
 let timesSelecionados = [];
 
 function preencherFiltros(dados) {
@@ -422,6 +549,7 @@ async function iniciar() {
   const tB = document.getElementById('time-b').value;
   montarGraficoRadar(dadosGlobais, tA, tB);
   montarTabela(dadosGlobais);
+  montarBracket(dadosGlobais);
 }
 
 // Iniciado pelo index.html após Chart.js carregar
