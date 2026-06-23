@@ -51,44 +51,6 @@ function preCarregarBandeiras(times) {
   })));
 }
 
-// ─── Plugin customizado para desenhar bandeiras no scatter ─────────────
-const pluginBandeiras = {
-  id: 'bandeiras',
-  afterDraw(chart) {
-    const { ctx, data, scales, chartArea } = chart;
-    if (!data.datasets[0]) return;
-
-    // Salva e recorta dentro da área do gráfico para bandeiras não saírem dos eixos
-    ctx.save();
-    ctx.rect(chartArea.left, chartArea.top, chartArea.width, chartArea.height);
-    ctx.clip();
-
-    data.datasets[0].data.forEach((ponto) => {
-      const x = scales.x.getPixelForValue(ponto.x);
-      const y = scales.y.getPixelForValue(ponto.y);
-      const img = imagensCache[ponto.label];
-      if (img) {
-        const w = 28, h = 21;
-        ctx.shadowColor = 'rgba(0,0,0,0.5)';
-        ctx.shadowBlur = 3;
-        ctx.drawImage(img, x - w/2, y - h/2, w, h);
-        ctx.shadowBlur = 0;
-      } else {
-        ctx.fillStyle = '#E8B931';
-        ctx.beginPath();
-        ctx.arc(x, y, 7, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#0B3D2E';
-        ctx.font = 'bold 7px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText((ponto.label || '?')[0], x, y);
-      }
-    });
-    ctx.restore();
-  }
-};
-
 // ─── 01 Evolução do rating ─────────────────────────────────────────────
 function serieRatingPorTime(motor, nomeTime) {
   const pontos = [{ x: 0, y: 1500 }];
@@ -154,51 +116,58 @@ function montarGraficoEvolucao(dados, selecionados) {
   });
 }
 
-// ─── 02 Ataque × Defesa (com bandeiras) ───────────────────────────────
+// ─── 02 Ataque × Defesa (com bandeiras via pointStyle nativo) ─────────
 async function montarGraficoDispersao(dados) {
   await preCarregarBandeiras(dados.times);
 
   const ctx = document.getElementById('chart-dispersao');
-  const pontos = dados.times.map(t => ({
-    x: parseFloat(t.ataque) || 1.35,
-    y: parseFloat(t.defesa) > 0 ? (3 - parseFloat(t.defesa)) : 1.65,
-    label: t.time,
-    grupo: t.grupo
-  }));
+
+  // Um dataset por time — assim cada ponto tem seu próprio pointStyle (bandeira)
+  const datasets = dados.times.map(t => {
+    const iso = FLAG_ISO[t.time];
+    const img = imagensCache[t.time];
+    return {
+      label: t.time,
+      data: [{
+        x: parseFloat(t.ataque) || 1.35,
+        y: parseFloat(t.defesa) > 0 ? (3 - parseFloat(t.defesa)) : 1.65,
+        label: t.time,
+        grupo: t.grupo
+      }],
+      pointStyle: img || 'circle',
+      pointRadius: img ? 14 : 6,
+      pointHoverRadius: img ? 16 : 8,
+      backgroundColor: img ? 'rgba(0,0,0,0)' : '#E8B931',
+      borderColor: 'rgba(0,0,0,0)',
+      pointBorderColor: 'rgba(0,0,0,0)',
+      pointHoverBorderColor: '#E8B931',
+      pointHoverBorderWidth: 2,
+      pointHoverBackgroundColor: img ? 'rgba(232,185,49,0.1)' : '#E8B931',
+    };
+  });
 
   if (chartDispersao) chartDispersao.destroy();
   chartDispersao = new Chart(ctx, {
     type: 'scatter',
-    data: {
-      datasets: [{
-        label: 'Seleções',
-        data: pontos,
-        pointRadius: 16,          // área de detecção grande o suficiente
-        pointHoverRadius: 16,
-        backgroundColor: 'rgba(0,0,0,0)',   // totalmente transparente
-        borderColor: 'rgba(0,0,0,0)',
-        pointBackgroundColor: 'rgba(0,0,0,0)',
-        pointBorderColor: 'rgba(0,0,0,0)',
-        pointHoverBackgroundColor: 'rgba(232,185,49,0.15)',
-        pointHoverBorderColor: '#E8B931',
-        pointHoverBorderWidth: 2,
-      }]
-    },
+    data: { datasets },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      layout: {
-        padding: { top: 20, right: 24, bottom: 8, left: 8 }
+      layout: { padding: { top: 20, right: 24, bottom: 8, left: 8 } },
+      interaction: {
+        mode: 'nearest',
+        intersect: true,
+        axis: 'xy'
       },
       scales: {
         x: {
           title: { display: true, text: 'Poder ofensivo →', color: 'rgba(240,244,237,0.5)', font: { size: 11 } },
-          ticks: { color: 'rgba(240,244,237,0.7)', font: { size: 10 }, z: 10 },
+          ticks: { color: 'rgba(240,244,237,0.7)', font: { size: 10 } },
           grid: { color: 'rgba(240,244,237,0.06)' }
         },
         y: {
           title: { display: true, text: 'Solidez defensiva →', color: 'rgba(240,244,237,0.5)', font: { size: 11 } },
-          ticks: { color: 'rgba(240,244,237,0.7)', font: { size: 10 }, z: 10 },
+          ticks: { color: 'rgba(240,244,237,0.7)', font: { size: 10 } },
           grid: { color: 'rgba(240,244,237,0.06)' }
         }
       },
@@ -212,7 +181,7 @@ async function montarGraficoDispersao(dados) {
           borderWidth: 1,
           padding: 10,
           callbacks: {
-            title: items => items[0].raw.label,
+            title: items => items[0].dataset.label,
             label: item => [
               `Grupo ${item.raw.grupo}`,
               `Ataque: ${item.raw.x.toFixed(2)}`,
@@ -221,8 +190,8 @@ async function montarGraficoDispersao(dados) {
           }
         }
       }
-    },
-    plugins: [pluginBandeiras]
+    }
+    // sem plugin customizado — Chart.js nativo desenha as bandeiras via pointStyle
   });
 }
 
