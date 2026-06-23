@@ -3,381 +3,279 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Copa 2026 — Modelo Estatístico Zero-Prior</title>
+<title>Copa 2026 — Modelo Estatístico</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
-  :root {
-    --verde-noite: #0B3D2E;
-    --verde-campo: #134A36;
-    --grama-clara: #F0F4ED;
-    --amarelo-cartao: #E8B931;
-    --vermelho-cartao: #C1432A;
-    --linha-sutil: rgba(240,244,237,0.14);
-    --texto-suave: rgba(240,244,237,0.68);
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-  * { box-sizing: border-box; }
+body {
+  background: #f5f7fa;
+  color: #1a2332;
+  font-family: 'Inter', -apple-system, sans-serif;
+  line-height: 1.5;
+}
 
-  body {
-    margin: 0;
-    background: var(--verde-noite);
-    color: var(--grama-clara);
-    font-family: 'Inter', -apple-system, sans-serif;
-    line-height: 1.5;
-  }
+/* ── Navegação global ── */
+.topnav {
+  background: #1a2332;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 52px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
 
-  .mono {
-    font-family: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
-    font-variant-numeric: tabular-nums;
-  }
+.topnav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+}
 
-  header.hero {
-    padding: 64px 24px 48px;
-    text-align: center;
-    border-bottom: 1px solid var(--linha-sutil);
-    background: radial-gradient(ellipse at top, rgba(232,185,49,0.08), transparent 60%);
-  }
+.topnav-brand span { color: #E8B931; }
 
-  .eyebrow {
-    font-size: 13px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--amarelo-cartao);
-    font-weight: 600;
-    margin-bottom: 18px;
-  }
+.topnav-links {
+  display: flex;
+  gap: 4px;
+}
 
-  h1 {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-weight: 800;
-    font-size: clamp(2.2rem, 6vw, 4rem);
-    margin: 0 0 16px;
-    letter-spacing: -0.01em;
-  }
+.topnav-link {
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: all 0.15s;
+}
 
-  .subtitulo {
-    max-width: 620px;
-    margin: 0 auto;
-    color: var(--texto-suave);
-    font-size: 1.05rem;
-  }
+.topnav-link:hover { color: #ffffff; background: rgba(255,255,255,0.1); }
+.topnav-link.ativo { color: #E8B931; background: rgba(232,185,49,0.12); font-weight: 600; }
 
-  .status-bar {
-    display: flex;
-    justify-content: center;
-    gap: 32px;
-    margin-top: 32px;
-    flex-wrap: wrap;
-  }
+/* ── Hero ── */
+.hero {
+  background: #1a2332;
+  padding: 48px 24px 40px;
+  text-align: center;
+  border-bottom: 3px solid #E8B931;
+}
 
-  .status-item {
-    text-align: center;
-  }
+.hero-eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #E8B931;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
 
-  .status-item .num {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--amarelo-cartao);
-  }
+.hero h1 {
+  font-family: Georgia, serif;
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  color: #ffffff;
+  font-weight: 800;
+  margin-bottom: 14px;
+  letter-spacing: -0.01em;
+}
 
-  .status-item .label {
-    font-size: 0.78rem;
-    color: var(--texto-suave);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
+.hero-sub {
+  color: rgba(255,255,255,0.6);
+  font-size: 1rem;
+  max-width: 560px;
+  margin: 0 auto 28px;
+}
 
-  main {
-    max-width: 1080px;
-    margin: 0 auto;
-    padding: 56px 24px 96px;
-  }
+.stats-bar {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
 
-  section {
-    margin-bottom: 72px;
-  }
+.stat-item .num {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #E8B931;
+  font-variant-numeric: tabular-nums;
+}
 
-  .section-head {
-    display: flex;
-    align-items: baseline;
-    gap: 16px;
-    margin-bottom: 8px;
-    border-bottom: 1px solid var(--linha-sutil);
-    padding-bottom: 16px;
-  }
+.stat-item .lbl {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
 
-  .section-head .indice {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    color: var(--amarelo-cartao);
-    font-weight: 700;
-    opacity: 0.5;
-  }
+/* ── Conteúdo principal ── */
+main { max-width: 1080px; margin: 0 auto; padding: 40px 24px 80px; }
 
-  .section-head h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.6rem;
-    margin: 0;
-    font-weight: 700;
-  }
+section { margin-bottom: 56px; }
 
-  .section-desc {
-    color: var(--texto-suave);
-    font-size: 0.95rem;
-    margin: 14px 0 28px;
-    max-width: 680px;
-  }
+.sec-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 12px;
+  margin-bottom: 8px;
+}
 
-  .card {
-    background: var(--verde-campo);
-    border: 1px solid var(--linha-sutil);
-    border-radius: 4px;
-    padding: 24px;
-  }
+.sec-num {
+  font-family: Georgia, serif;
+  font-size: 1.6rem;
+  color: #E8B931;
+  font-weight: 700;
+  opacity: 0.6;
+}
 
-  .chart-wrap {
-    position: relative;
-    height: 380px;
-  }
+.sec-head h2 {
+  font-family: Georgia, serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1a2332;
+}
 
-  .controls {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-  }
+.sec-desc {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin: 10px 0 22px;
+  max-width: 640px;
+}
 
-  select, button {
-    background: var(--verde-noite);
-    color: var(--grama-clara);
-    border: 1px solid var(--linha-sutil);
-    border-radius: 4px;
-    padding: 8px 14px;
-    font-size: 0.88rem;
-    font-family: inherit;
-    cursor: pointer;
-  }
+/* ── Card ── */
+.card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
 
-  select:hover, button:hover {
-    border-color: var(--amarelo-cartao);
-  }
+.chart-wrap { position: relative; height: 360px; }
 
-  button.primary {
-    background: var(--amarelo-cartao);
-    color: var(--verde-noite);
-    font-weight: 600;
-    border-color: var(--amarelo-cartao);
-  }
+/* ── Controles ── */
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
 
-  .radar-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-  }
+select, button {
+  background: #f8fafc;
+  color: #1a2332;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 7px 12px;
+  font-size: 0.84rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
 
-  @media (max-width: 720px) {
-    .radar-grid { grid-template-columns: 1fr; }
-  }
+select:hover, button:hover { border-color: #E8B931; }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.88rem;
-  }
+#btn-times {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
 
-  th, td {
-    text-align: left;
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--linha-sutil);
-  }
+/* ── Tabela ranking ── */
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+th {
+  text-align: left;
+  padding: 9px 12px;
+  border-bottom: 2px solid #e2e8f0;
+  color: #94a3b8;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  background: #f8fafc;
+}
+td {
+  padding: 9px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1a2332;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+tr:hover td { background: #f8fafc; }
+tr:last-child td { border-bottom: none; }
 
-  th {
-    color: var(--amarelo-cartao);
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.72rem;
-    letter-spacing: 0.05em;
-  }
-
-  td.num { text-align: right; }
-
-  .badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 3px;
-    font-size: 0.7rem;
-    font-weight: 600;
-  }
-
-  .badge.encerrado { background: rgba(232,185,49,0.15); color: var(--amarelo-cartao); }
-  .badge.aberto { background: rgba(240,244,237,0.1); color: var(--texto-suave); }
-
-  footer {
-    text-align: center;
-    padding: 32px 24px;
-    color: var(--texto-suave);
-    font-size: 0.82rem;
-    border-top: 1px solid var(--linha-sutil);
-  }
-
-  /* ── Bracket mata-mata ── */
-  .bracket {
-    display: flex;
-    gap: 0;
-    overflow-x: auto;
-    padding-bottom: 16px;
-  }
-
-  .bracket-fase {
-    display: flex;
-    flex-direction: column;
-    min-width: 180px;
-  }
-
-  .bracket-fase-titulo {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--amarelo-cartao);
-    text-align: center;
-    padding: 8px 0 12px;
-    font-weight: 600;
-  }
-
-  .bracket-slots {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    justify-content: space-around;
-    gap: 4px;
-  }
-
-  .confronto {
-    background: rgba(240,244,237,0.04);
-    border: 1px solid rgba(240,244,237,0.1);
-    border-radius: 4px;
-    margin: 2px 6px;
-    padding: 6px 8px;
-    cursor: default;
-    transition: border-color 0.15s;
-    position: relative;
-  }
-
-  .confronto:hover { border-color: var(--amarelo-cartao); }
-
-  .confronto-time {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 3px 0;
-    font-size: 0.78rem;
-    color: var(--grama-clara);
-  }
-
-  .confronto-time.vencedor { color: var(--amarelo-cartao); font-weight: 600; }
-  .confronto-time.eliminado { color: rgba(240,244,237,0.35); text-decoration: line-through; }
-
-  .confronto-prob {
-    font-size: 0.68rem;
-    color: rgba(240,244,237,0.4);
-    text-align: right;
-    margin-top: 2px;
-  }
-
-  .confronto-tooltip {
-    display: none;
-    position: absolute;
-    left: 105%;
-    top: 0;
-    z-index: 20;
-    background: rgba(11,61,46,0.98);
-    border: 1px solid rgba(232,185,49,0.4);
-    border-radius: 4px;
-    padding: 10px 14px;
-    font-size: 0.8rem;
-    white-space: nowrap;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    min-width: 200px;
-  }
-
-  .confronto:hover .confronto-tooltip { display: block; }
-
-  .slot-vazio {
-    font-size: 0.72rem;
-    color: rgba(240,244,237,0.25);
-    font-style: italic;
-  }
-
-  @media (max-width: 720px) {
-    .bracket { flex-direction: column; }
-    .bracket-fase { min-width: unset; }
-  }
-
-  .erro {
-    background: rgba(193,67,42,0.15);
-    border: 1px solid var(--vermelho-cartao);
-    color: var(--grama-clara);
-    padding: 16px;
-    border-radius: 4px;
-    font-size: 0.9rem;
-  }
-
-  .loading {
-    color: var(--texto-suave);
-    font-size: 0.9rem;
-    padding: 20px;
-    text-align: center;
-  }
+/* ── Footer ── */
+footer {
+  text-align: center;
+  padding: 24px;
+  color: #94a3b8;
+  font-size: 0.78rem;
+  border-top: 1px solid #e2e8f0;
+  background: #ffffff;
+}
 </style>
 </head>
 <body>
 
+<!-- Navegação global -->
+<nav class="topnav">
+  <a class="topnav-brand" href="index.html">⚽ <span>Copa 2026</span> · Modelo Zero-Prior</a>
+  <div class="topnav-links">
+    <a class="topnav-link ativo" href="index.html">📊 Dashboard</a>
+    <a class="topnav-link" href="bracket.html">🏆 Chaveamento</a>
+  </div>
+</nav>
+
+<!-- Hero -->
 <header class="hero">
-  <div class="eyebrow">Copa do Mundo 2026 · Experimento Estatístico</div>
+  <div class="hero-eyebrow">Copa do Mundo 2026 · Experimento Estatístico</div>
   <h1>Todos partem do mesmo ponto</h1>
-  <p class="subtitulo">
-    48 seleções, um único rating inicial. Nenhum ranking prévio, nenhuma vantagem de papel —
-    só os 104 jogos do torneio revelando, partida a partida, quem é realmente forte.
+  <p class="hero-sub">
+    48 seleções, rating inicial idêntico. Nenhum ranking prévio — só os jogos da Copa revelando, partida a partida, quem é realmente forte.
   </p>
-  <div class="status-bar">
-    <div class="status-item"><div class="num mono" id="stat-jogos">—</div><div class="label">Jogos disputados</div></div>
-    <div class="status-item"><div class="num mono" id="stat-restantes">—</div><div class="label">Jogos restantes</div></div>
-    <div class="status-item"><div class="num mono" id="stat-atualizado">—</div><div class="label">Última atualização</div></div>
+  <div class="stats-bar">
+    <div class="stat-item"><div class="num" id="stat-jogos">—</div><div class="lbl">Jogos disputados</div></div>
+    <div class="stat-item"><div class="num" id="stat-restantes">—</div><div class="lbl">Jogos restantes</div></div>
+    <div class="stat-item"><div class="num" id="stat-atualizado">—</div><div class="lbl">Última atualização</div></div>
   </div>
 </header>
 
 <main>
 
   <section id="secao-evolucao">
-    <div class="section-head">
-      <span class="indice">01</span>
+    <div class="sec-head">
+      <span class="sec-num">01</span>
       <h2>Evolução do rating</h2>
     </div>
-    <p class="section-desc">
-      Cada linha começa em 1500 — o ponto de partida igual para todas as seleções — e se afasta
-      conforme os resultados reais da Copa acontecem. A inclinação conta a história: subidas
-      bruscas são vitórias contra times bem avaliados; quedas, tropeços inesperados.
+    <p class="sec-desc">
+      Cada linha começa em 1500 — ponto de partida igual para todas — e diverge conforme os resultados reais acontecem. Selecione um grupo ou times individuais.
     </p>
     <div class="card">
       <div class="controls">
         <select id="filtro-grupo">
           <option value="todos">Todos os grupos</option>
         </select>
-        <select id="filtro-times" multiple style="min-width:220px;">
-        </select>
+        <div id="btn-times"></div>
+        <select id="filtro-times" style="display:none" multiple></select>
       </div>
       <div class="chart-wrap"><canvas id="chart-evolucao"></canvas></div>
     </div>
   </section>
 
   <section id="secao-dispersao">
-    <div class="section-head">
-      <span class="indice">02</span>
+    <div class="sec-head">
+      <span class="sec-num">02</span>
       <h2>Ataque × Defesa</h2>
     </div>
-    <p class="section-desc">
-      Cada ponto é uma seleção, posicionada pelo seu poder ofensivo (eixo horizontal) e solidez
-      defensiva (eixo vertical — invertido, então "mais alto" significa sofrer menos gols).
-      O canto superior direito é onde moram os favoritos.
+    <p class="sec-desc">
+      Cada ponto é uma seleção. Eixo horizontal: poder ofensivo. Eixo vertical: solidez defensiva (maior = sofre menos). Canto superior direito: favoritos.
     </p>
     <div class="card">
       <div class="chart-wrap"><canvas id="chart-dispersao"></canvas></div>
@@ -385,18 +283,17 @@
   </section>
 
   <section id="secao-confronto">
-    <div class="section-head">
-      <span class="indice">03</span>
+    <div class="sec-head">
+      <span class="sec-num">03</span>
       <h2>Confronto direto</h2>
     </div>
-    <p class="section-desc">
-      Compare duas seleções lado a lado nos quatro eixos do modelo. Útil para qualquer
-      cruzamento — especialmente na véspera de um mata-mata.
+    <p class="sec-desc">
+      Compare duas seleções lado a lado. Útil especialmente na véspera de um mata-mata.
     </p>
     <div class="card">
       <div class="controls">
         <select id="time-a"></select>
-        <span style="align-self:center; color: var(--texto-suave);">vs</span>
+        <span style="color:#94a3b8;font-weight:600">vs</span>
         <select id="time-b"></select>
       </div>
       <div class="chart-wrap"><canvas id="chart-radar"></canvas></div>
@@ -404,62 +301,42 @@
   </section>
 
   <section id="secao-tabela">
-    <div class="section-head">
-      <span class="indice">04</span>
+    <div class="sec-head">
+      <span class="sec-num">04</span>
       <h2>Ranking completo</h2>
     </div>
-    <p class="section-desc">
-      Todas as seleções, ordenadas pelo rating atual — a força revelada até aqui pelo próprio torneio.
+    <p class="sec-desc">
+      Todas as seleções ordenadas pelo rating atual — a força revelada pelos jogos desta Copa.
     </p>
     <div class="card">
       <table id="tabela-ranking">
         <thead>
-          <tr><th>#</th><th>Seleção</th><th>Grupo</th><th class="num">Rating</th><th class="num">Ataque</th><th class="num">Defesa</th></tr>
+          <tr>
+            <th>#</th>
+            <th>Seleção</th>
+            <th>Grupo</th>
+            <th class="num">Rating</th>
+            <th class="num">Ataque</th>
+            <th class="num">Defesa</th>
+          </tr>
         </thead>
         <tbody></tbody>
       </table>
     </div>
   </section>
 
-  <section id="secao-matamata">
-    <div class="section-head">
-      <span class="indice">05</span>
-      <h2>Mata-mata</h2>
-    </div>
-    <p class="section-desc">
-      Chaveamento oficial dos 16-avos de final. As probabilidades são calculadas pelo modelo
-      a partir dos parâmetros de ataque, defesa e rating de cada seleção — atualizadas após cada rodada.
-      Passe o mouse sobre um confronto para ver a probabilidade detalhada.
-    </p>
-    <div class="card" id="bracket-container">
-      <div id="bracket-loading" style="text-align:center;padding:40px;color:rgba(240,244,237,0.5);">
-        Carregando chaveamento...
-      </div>
-    </div>
-  </section>
-
 </main>
 
 <footer>
-  Dados: planilha própria (Elo + Ataque/Defesa zero-prior) alimentada via API-Football.
-  Projeto experimental — não afiliado à FIFA.
+  Dados via API-Football · Modelo Elo zero-prior (ataque/defesa) · Projeto experimental — não afiliado à FIFA
 </footer>
 
 <script src="data-loader.js"></script>
 <script>
-  // Carrega Chart.js e só depois carrega charts.js
   (function() {
-    var chartScript = document.createElement('script');
-    chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js';
-    chartScript.onload = function() {
-      var appScript = document.createElement('script');
-      appScript.src = 'charts.js';
-      document.body.appendChild(appScript);
-    };
-    chartScript.onerror = function() {
-      console.error('Falha ao carregar Chart.js do CDN');
-    };
-    document.body.appendChild(chartScript);
+    var s = document.createElement('script');
+    s.src = 'charts.js?v=' + Date.now();
+    document.body.appendChild(s);
   })();
 </script>
 </body>
