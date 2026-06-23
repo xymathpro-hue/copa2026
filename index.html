@@ -219,6 +219,99 @@
     border-top: 1px solid var(--linha-sutil);
   }
 
+  /* ── Bracket mata-mata ── */
+  .bracket {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    padding-bottom: 16px;
+  }
+
+  .bracket-fase {
+    display: flex;
+    flex-direction: column;
+    min-width: 180px;
+  }
+
+  .bracket-fase-titulo {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--amarelo-cartao);
+    text-align: center;
+    padding: 8px 0 12px;
+    font-weight: 600;
+  }
+
+  .bracket-slots {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: space-around;
+    gap: 4px;
+  }
+
+  .confronto {
+    background: rgba(240,244,237,0.04);
+    border: 1px solid rgba(240,244,237,0.1);
+    border-radius: 4px;
+    margin: 2px 6px;
+    padding: 6px 8px;
+    cursor: default;
+    transition: border-color 0.15s;
+    position: relative;
+  }
+
+  .confronto:hover { border-color: var(--amarelo-cartao); }
+
+  .confronto-time {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 0;
+    font-size: 0.78rem;
+    color: var(--grama-clara);
+  }
+
+  .confronto-time.vencedor { color: var(--amarelo-cartao); font-weight: 600; }
+  .confronto-time.eliminado { color: rgba(240,244,237,0.35); text-decoration: line-through; }
+
+  .confronto-prob {
+    font-size: 0.68rem;
+    color: rgba(240,244,237,0.4);
+    text-align: right;
+    margin-top: 2px;
+  }
+
+  .confronto-tooltip {
+    display: none;
+    position: absolute;
+    left: 105%;
+    top: 0;
+    z-index: 20;
+    background: rgba(11,61,46,0.98);
+    border: 1px solid rgba(232,185,49,0.4);
+    border-radius: 4px;
+    padding: 10px 14px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    min-width: 200px;
+  }
+
+  .confronto:hover .confronto-tooltip { display: block; }
+
+  .slot-vazio {
+    font-size: 0.72rem;
+    color: rgba(240,244,237,0.25);
+    font-style: italic;
+  }
+
+  @media (max-width: 720px) {
+    .bracket { flex-direction: column; }
+    .bracket-fase { min-width: unset; }
+  }
+
   .erro {
     background: rgba(193,67,42,0.15);
     border: 1px solid var(--vermelho-cartao);
@@ -325,6 +418,23 @@
         </thead>
         <tbody></tbody>
       </table>
+    </div>
+  </section>
+
+  <section id="secao-matamata">
+    <div class="section-head">
+      <span class="indice">05</span>
+      <h2>Mata-mata</h2>
+    </div>
+    <p class="section-desc">
+      Chaveamento oficial dos 16-avos de final. As probabilidades são calculadas pelo modelo
+      a partir dos parâmetros de ataque, defesa e rating de cada seleção — atualizadas após cada rodada.
+      Passe o mouse sobre um confronto para ver a probabilidade detalhada.
+    </p>
+    <div class="card" id="bracket-container">
+      <div id="bracket-loading" style="text-align:center;padding:40px;color:rgba(240,244,237,0.5);">
+        Carregando chaveamento...
+      </div>
     </div>
   </section>
 
