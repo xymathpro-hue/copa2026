@@ -335,15 +335,22 @@
   Projeto experimental — não afiliado à FIFA.
 </footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <script src="data-loader.js"></script>
 <script>
-  // Aguarda Chart.js e DOM prontos antes de iniciar
-  window.addEventListener('load', function() {
-    var script = document.createElement('script');
-    script.src = 'charts.js';
-    document.body.appendChild(script);
-  });
+  // Carrega Chart.js e só depois carrega charts.js
+  (function() {
+    var chartScript = document.createElement('script');
+    chartScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js';
+    chartScript.onload = function() {
+      var appScript = document.createElement('script');
+      appScript.src = 'charts.js';
+      document.body.appendChild(appScript);
+    };
+    chartScript.onerror = function() {
+      console.error('Falha ao carregar Chart.js do CDN');
+    };
+    document.body.appendChild(chartScript);
+  })();
 </script>
 </body>
 </html>
