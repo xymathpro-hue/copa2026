@@ -116,81 +116,64 @@ function montarGraficoEvolucao(dados, selecionados) {
   });
 }
 
-// ─── 02 Ataque × Defesa (bandeiras no canvas + tooltip HTML customizado) ─
+// ─── Siglas de 3 letras por seleção ───────────────────────────────────
+const SIGLAS = {
+  'México':'MEX','Coreia do Sul':'KOR','República Tcheca':'CZE','África do Sul':'RSA',
+  'Bósnia e Herzegovina':'BIH','Canadá':'CAN','Catar':'QAT','Suíça':'SUI',
+  'Escócia':'SCO','Brasil':'BRA','Marrocos':'MAR','Haiti':'HAI',
+  'Estados Unidos':'USA','Austrália':'AUS','Turquia':'TUR','Paraguai':'PAR',
+  'Alemanha':'GER','Costa do Marfim':'CIV','Equador':'ECU','Curaçao':'CUW',
+  'Suécia':'SWE','Holanda':'NED','Japão':'JPN','Tunísia':'TUN',
+  'Irã':'IRN','Nova Zelândia':'NZL','Bélgica':'BEL','Egito':'EGY',
+  'Arábia Saudita':'KSA','Uruguai':'URU','Cabo Verde':'CPV','Espanha':'ESP',
+  'França':'FRA','Iraque':'IRQ','Noruega':'NOR','Senegal':'SEN',
+  'Argélia':'ALG','Argentina':'ARG','Áustria':'AUT','Jordânia':'JOR',
+  'Colômbia':'COL','Portugal':'POR','República Democrática do Congo':'COD','Uzbequistão':'UZB',
+  'Croácia':'CRO','Gana':'GHA','Inglaterra':'ENG','Panamá':'PAN'
+};
+
+// Cor por grupo (12 grupos, 12 cores)
+const COR_GRUPO = {
+  'A':'#E8B931','B':'#6FAE8C','C':'#C1432A','D':'#7CA8C9',
+  'E':'#D98E4A','F':'#A06CC2','G':'#5FB8B0','H':'#D4566B',
+  'I':'#8BAE3E','J':'#C77DD1','K':'#E8D031','L':'#5FAEAE'
+};
+
+// ─── 02 Ataque × Defesa (círculos coloridos por grupo + sigla) ─────────
 async function montarGraficoDispersao(dados) {
-  await preCarregarBandeiras(dados.times);
+  const ctx = document.getElementById('chart-dispersao');
 
-  const canvas = document.getElementById('chart-dispersao');
-  const wrap   = canvas.parentElement;
-
-  // Criar tooltip HTML fixo (invisível por padrão)
-  let tooltipEl = document.getElementById('tooltip-dispersao');
-  if (!tooltipEl) {
-    tooltipEl = document.createElement('div');
-    tooltipEl.id = 'tooltip-dispersao';
-    tooltipEl.style.cssText = `
-      position:absolute;pointer-events:none;display:none;z-index:99;
-      background:rgba(11,61,46,0.97);border:1px solid rgba(232,185,49,0.4);
-      border-radius:4px;padding:8px 12px;font-size:0.82rem;color:#F0F4ED;
-      white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.4);
-    `;
-    wrap.style.position = 'relative';
-    wrap.appendChild(tooltipEl);
-  }
-
-  const pontos = dados.times.map(t => ({
-    x: parseFloat(t.ataque) || 1.35,
-    y: parseFloat(t.defesa) > 0 ? (3 - parseFloat(t.defesa)) : 1.65,
-    label: t.time,
-    grupo: t.grupo,
-    rating: Math.round(parseFloat(t.rating)) || 1500
+  // Agrupar por grupo para legenda
+  const grupos = [...new Set(dados.times.map(t => t.grupo))].sort();
+  const datasets = grupos.map(g => ({
+    label: `Grupo ${g}`,
+    data: dados.times
+      .filter(t => t.grupo === g)
+      .map(t => ({
+        x: parseFloat(t.ataque) || 1.35,
+        y: parseFloat(t.defesa) > 0 ? (3 - parseFloat(t.defesa)) : 1.65,
+        label: t.time,
+        sigla: SIGLAS[t.time] || t.time.slice(0,3).toUpperCase(),
+        grupo: t.grupo,
+        rating: Math.round(parseFloat(t.rating)) || 1500
+      })),
+    backgroundColor: COR_GRUPO[g] || '#E8B931',
+    borderColor: 'rgba(11,61,46,0.8)',
+    borderWidth: 1,
+    pointRadius: 14,
+    pointHoverRadius: 16,
+    pointStyle: 'circle',
   }));
 
-  // Plugin canvas para desenhar bandeiras
-  const pluginFlags = {
-    id: 'flags',
-    afterDatasetsDraw(chart) {
-      const { ctx, scales, chartArea } = chart;
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(chartArea.left, chartArea.top, chartArea.width, chartArea.height);
-      ctx.clip();
-      pontos.forEach(p => {
-        const px = scales.x.getPixelForValue(p.x);
-        const py = scales.y.getPixelForValue(p.y);
-        const img = imagensCache[p.label];
-        if (img) {
-          ctx.drawImage(img, px - 14, py - 11, 28, 21);
-        } else {
-          ctx.fillStyle = '#E8B931';
-          ctx.beginPath();
-          ctx.arc(px, py, 7, 0, Math.PI*2);
-          ctx.fill();
-        }
-      });
-      ctx.restore();
-    }
-  };
-
   if (chartDispersao) chartDispersao.destroy();
-  chartDispersao = new Chart(canvas, {
+  chartDispersao = new Chart(ctx, {
     type: 'scatter',
-    data: {
-      datasets: [{
-        data: pontos,
-        pointRadius: 0,
-        pointHoverRadius: 0,
-        backgroundColor: 'transparent'
-      }]
-    },
+    data: { datasets },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       layout: { padding: { top: 20, right: 24, bottom: 8, left: 8 } },
-      plugins: {
-        legend: { display: false },
-        tooltip: { enabled: false } // desabilitamos o tooltip nativo
-      },
+      interaction: { mode: 'nearest', intersect: true },
       scales: {
         x: {
           title: { display: true, text: 'Poder ofensivo →', color: 'rgba(240,244,237,0.5)', font: { size: 11 } },
@@ -203,54 +186,49 @@ async function montarGraficoDispersao(dados) {
           grid: { color: 'rgba(240,244,237,0.06)' }
         }
       },
-      onHover: (event, elements, chart) => {
-        // Detectar qual bandeira o mouse está sobre
-        const rect = canvas.getBoundingClientRect();
-        const mx = event.native.clientX - rect.left;
-        const my = event.native.clientY - rect.top;
-        const scX = chart.scales.x;
-        const scY = chart.scales.y;
-
-        let encontrado = null;
-        pontos.forEach(p => {
-          const px = scX.getPixelForValue(p.x);
-          const py = scY.getPixelForValue(p.y);
-          if (Math.abs(mx - px) < 16 && Math.abs(my - py) < 13) {
-            encontrado = { p, px, py };
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: { color: '#F0F4ED', font: { size: 10 }, boxWidth: 10, padding: 10 }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(11,61,46,0.97)',
+          titleColor: '#E8B931',
+          bodyColor: '#F0F4ED',
+          borderColor: 'rgba(232,185,49,0.4)',
+          borderWidth: 1,
+          padding: 10,
+          callbacks: {
+            title: items => items[0].raw.label,
+            label: item => [
+              `Grupo ${item.raw.grupo}  ·  Rating ${item.raw.rating}`,
+              `Ataque: ${item.raw.x.toFixed(2)}  ·  Defesa: ${(3 - item.raw.y).toFixed(2)}`
+            ]
           }
-        });
-
-        if (encontrado) {
-          const { p, px, py } = encontrado;
-          const iso = FLAG_ISO[p.label];
-          const flagHtml = iso ? `<img src="https://flagcdn.com/20x15/${iso}.png" style="vertical-align:middle;margin-right:6px;">` : '';
-          tooltipEl.innerHTML = `
-            <div style="color:#E8B931;font-weight:600;margin-bottom:4px">${flagHtml}${p.label}</div>
-            <div>Grupo ${p.grupo} &nbsp;·&nbsp; Rating ${p.rating}</div>
-            <div>Ataque: ${p.x.toFixed(2)} &nbsp;·&nbsp; Defesa: ${(3 - p.y).toFixed(2)}</div>
-          `;
-          // Posicionar tooltip relativo ao wrapper
-          const wrapRect = wrap.getBoundingClientRect();
-          let left = px + 20;
-          let top  = py - 20;
-          if (left + 220 > wrap.offsetWidth) left = px - 230;
-          if (top < 0) top = py + 10;
-          tooltipEl.style.left = left + 'px';
-          tooltipEl.style.top  = top + 'px';
-          tooltipEl.style.display = 'block';
-          canvas.style.cursor = 'pointer';
-        } else {
-          tooltipEl.style.display = 'none';
-          canvas.style.cursor = 'default';
         }
       }
     },
-    plugins: [pluginFlags]
-  });
-
-  // Esconder tooltip ao sair do canvas
-  canvas.addEventListener('mouseleave', () => {
-    tooltipEl.style.display = 'none';
+    plugins: [{
+      // Plugin para desenhar a sigla dentro do círculo
+      id: 'siglas',
+      afterDatasetsDraw(chart) {
+        const { ctx: c } = chart;
+        chart.data.datasets.forEach((ds, di) => {
+          const meta = chart.getDatasetMeta(di);
+          meta.data.forEach((el, ei) => {
+            const ponto = ds.data[ei];
+            c.save();
+            c.fillStyle = '#0B3D2E';
+            c.font = 'bold 7px sans-serif';
+            c.textAlign = 'center';
+            c.textBaseline = 'middle';
+            c.fillText(ponto.sigla, el.x, el.y);
+            c.restore();
+          });
+        });
+      }
+    }]
   });
 }
 
