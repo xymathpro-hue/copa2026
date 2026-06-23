@@ -290,9 +290,12 @@ function montarTabela(dados) {
 }
 
 // ─── Filtros ──────────────────────────────────────────────────────────
+let timesSelecionados = [];
+
 function preencherFiltros(dados) {
   const nomes = dados.times.map(t => t.time);
 
+  // --- Seletor de grupo ---
   const selGrupo = document.getElementById('filtro-grupo');
   [...new Set(dados.times.map(t => t.grupo))].sort().forEach(g => {
     const o = document.createElement('option');
@@ -300,14 +303,68 @@ function preencherFiltros(dados) {
     selGrupo.appendChild(o);
   });
 
+  // --- Substituir o select múltiplo por botões de toggle ---
   const selTimes = document.getElementById('filtro-times');
-  nomes.forEach((nome, i) => {
-    const o = document.createElement('option');
-    o.value = nome; o.textContent = nome;
-    if (i < 4) o.selected = true;
-    selTimes.appendChild(o);
+  selTimes.style.display = 'none'; // esconder o select original
+
+  // Criar container de botões
+  const btnContainer = document.createElement('div');
+  btnContainer.id = 'btn-times';
+  btnContainer.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;max-height:120px;overflow-y:auto;';
+  selTimes.parentNode.insertBefore(btnContainer, selTimes.nextSibling);
+
+  // Selecionar grupo A por padrão
+  timesSelecionados = dados.times.filter(t => t.grupo === 'A').map(t => t.time);
+
+  function renderBotoes(grupoFiltro) {
+    btnContainer.innerHTML = '';
+    const timesFiltrados = grupoFiltro === 'todos'
+      ? dados.times
+      : dados.times.filter(t => t.grupo === grupoFiltro);
+
+    timesFiltrados.forEach(t => {
+      const iso = FLAG_ISO[t.time];
+      const flagHtml = iso ? `<img src="https://flagcdn.com/16x12/${iso}.png" style="margin-right:4px;vertical-align:middle;">` : '';
+      const btn = document.createElement('button');
+      btn.innerHTML = flagHtml + t.time;
+      btn.dataset.time = t.time;
+      btn.style.cssText = `
+        padding:4px 10px;border-radius:3px;font-size:0.78rem;cursor:pointer;
+        transition:all 0.15s;border:1px solid rgba(240,244,237,0.2);
+        background:${timesSelecionados.includes(t.time) ? 'rgba(232,185,49,0.2)' : 'rgba(11,61,46,0.6)'};
+        color:${timesSelecionados.includes(t.time) ? '#E8B931' : 'rgba(240,244,237,0.7)'};
+        border-color:${timesSelecionados.includes(t.time) ? '#E8B931' : 'rgba(240,244,237,0.2)'};
+      `;
+      btn.addEventListener('click', () => {
+        const nome = btn.dataset.time;
+        if (timesSelecionados.includes(nome)) {
+          if (timesSelecionados.length > 1) { // mínimo 1 selecionado
+            timesSelecionados = timesSelecionados.filter(n => n !== nome);
+          }
+        } else {
+          timesSelecionados.push(nome);
+        }
+        renderBotoes(selGrupo.value);
+        montarGraficoEvolucao(dadosGlobais, timesSelecionados);
+      });
+      btnContainer.appendChild(btn);
+    });
+  }
+
+  renderBotoes('A'); // começa no grupo A
+  selGrupo.value = 'A';
+
+  selGrupo.addEventListener('change', () => {
+    const g = selGrupo.value;
+    // Ao mudar grupo, selecionar automaticamente todos os times do grupo
+    timesSelecionados = g === 'todos'
+      ? dados.times.slice(0, 4).map(t => t.time)
+      : dados.times.filter(t => t.grupo === g).map(t => t.time);
+    renderBotoes(g);
+    montarGraficoEvolucao(dadosGlobais, timesSelecionados);
   });
 
+  // --- Seletores do radar ---
   const tA = document.getElementById('time-a');
   const tB = document.getElementById('time-b');
   nomes.forEach((nome, i) => {
@@ -317,30 +374,6 @@ function preencherFiltros(dados) {
     const oB = document.createElement('option'); oB.value = nome; oB.textContent = nome;
     if (i === 1) oB.selected = true;
     tB.appendChild(oB);
-  });
-
-  selGrupo.addEventListener('change', () => {
-    const g = selGrupo.value;
-    // Mostrar/ocultar opções
-    Array.from(selTimes.options).forEach(o => {
-      const info = dados.times.find(t => t.time === o.value);
-      o.hidden = g !== 'todos' && info && info.grupo !== g;
-      // Se filtrando por grupo, selecionar os 4 times desse grupo automaticamente
-      if (g !== 'todos') {
-        o.selected = info && info.grupo === g;
-      } else {
-        // "Todos" → seleciona os 4 primeiros
-        o.selected = Array.from(selTimes.options).indexOf(o) < 4;
-      }
-    });
-    // Atualizar gráfico com os times agora selecionados
-    const sel = Array.from(selTimes.selectedOptions).map(o => o.value);
-    montarGraficoEvolucao(dadosGlobais, sel);
-  });
-
-  selTimes.addEventListener('change', () => {
-    const sel = Array.from(selTimes.selectedOptions).map(o => o.value);
-    montarGraficoEvolucao(dadosGlobais, sel);
   });
 
   tA.addEventListener('change', () => montarGraficoRadar(dadosGlobais, tA.value, tB.value));
@@ -363,8 +396,8 @@ async function iniciar() {
   preencherStatusBar(dadosGlobais);
   preencherFiltros(dadosGlobais);
 
-  const timesIniciais = dadosGlobais.times.slice(0, 4).map(t => t.time);
-  montarGraficoEvolucao(dadosGlobais, timesIniciais);
+  // timesSelecionados já foi definido dentro de preencherFiltros (grupo A)
+  montarGraficoEvolucao(dadosGlobais, timesSelecionados);
   await montarGraficoDispersao(dadosGlobais);
 
   const tA = document.getElementById('time-a').value;
