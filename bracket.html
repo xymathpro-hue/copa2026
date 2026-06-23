@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chaveamento Copa 2026</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #0B3D2E;
+  color: #F0F4ED;
+  font-family: 'Inter', -apple-system, sans-serif;
+  min-height: 100vh;
+  padding: 24px 16px 48px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 1.4rem;
+  color: #E8B931;
+  margin-bottom: 4px;
+  font-family: Georgia, serif;
+}
+
+.subtitulo {
+  text-align: center;
+  font-size: 0.8rem;
+  color: rgba(240,244,237,0.5);
+  margin-bottom: 24px;
+}
+
+/* ── Layout espelhado ── */
+.bracket-wrap {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: auto;
+  gap: 0 4px;
+  min-width: 1100px;
+}
+
+.fase-titulo {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #E8B931;
+  text-align: center;
+  padding: 0 0 10px;
+  font-weight: 700;
+  grid-row: 1;
+}
+
+.col-slots {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  grid-row: 2;
+}
+
+/* Colunas no grid */
+.col-1  { grid-column: 1; }
+.col-2  { grid-column: 2; }
+.col-3  { grid-column: 3; }
+.col-4  { grid-column: 4; }
+.col-5  { grid-column: 5; } /* FINAL no centro */
+.col-6  { grid-column: 6; }
+.col-7  { grid-column: 7; }
+.col-8  { grid-column: 8; }
+.col-9  { grid-column: 9; }
+
+/* ── Cartão de confronto ── */
+.jogo {
+  background: rgba(240,244,237,0.04);
+  border: 1px solid rgba(240,244,237,0.1);
+  border-radius: 5px;
+  padding: 6px 8px;
+  margin: 3px 2px;
+  font-size: 0.75rem;
+  cursor: default;
+  transition: border-color 0.15s, background 0.15s;
+  position: relative;
+}
+.jogo:hover { border-color: #E8B931; background: rgba(232,185,49,0.06); }
+
+.jogo-id {
+  font-size: 0.58rem;
+  color: rgba(240,244,237,0.3);
+  text-align: right;
+  margin-bottom: 3px;
+  letter-spacing: 0.05em;
+}
+
+.time-linha {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.time-nome {
+  font-size: 0.73rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.time-nome.vencedor { color: #E8B931; font-weight: 600; }
+.time-nome.eliminado { color: rgba(240,244,237,0.3); text-decoration: line-through; }
+.time-nome.pendente { color: rgba(240,244,237,0.35); font-style: italic; font-size: 0.67rem; }
+
+.placar {
+  font-size: 0.72rem;
+  color: #E8B931;
+  font-weight: 700;
+  min-width: 14px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.prob-bar {
+  margin-top: 5px;
+  height: 4px;
+  border-radius: 2px;
+  overflow: hidden;
+  display: flex;
+  background: rgba(240,244,237,0.06);
+}
+
+.prob-fill-a { height: 100%; }
+.prob-fill-b { height: 100%; }
+
+.prob-txt {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.6rem;
+  color: rgba(240,244,237,0.35);
+  margin-top: 2px;
+}
+
+.jogo-vazio {
+  background: rgba(240,244,237,0.015);
+  border: 1px dashed rgba(240,244,237,0.07);
+  border-radius: 5px;
+  padding: 6px 8px;
+  margin: 3px 2px;
+  min-height: 60px;
+}
+
+/* ── FINAL no centro ── */
+.final-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  grid-row: 2;
+  grid-column: 5;
+  gap: 8px;
+}
+
+.final-titulo {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #E8B931;
+  font-weight: 700;
+  text-align: center;
+}
+
+.trofeu {
+  font-size: 2.2rem;
+  text-align: center;
+  margin: 4px 0;
+}
+
+/* ── Tooltip ── */
+.tt {
+  display: none;
+  position: absolute;
+  z-index: 50;
+  left: 105%;
+  top: 0;
+  background: rgba(11,61,46,0.98);
+  border: 1px solid rgba(232,185,49,0.45);
+  border-radius: 4px;
+  padding: 10px 14px;
+  font-size: 0.78rem;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  min-width: 200px;
+}
+.jogo:hover .tt { display: block; }
+
+/* ── Scroll wrapper ── */
+.scroll {
+  overflow-x: auto;
+  padding-bottom: 12px;
+}
+
+.legenda {
+  text-align: center;
+  font-size: 0.72rem;
+  color: rgba(240,244,237,0.4);
+  margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  body { padding: 16px 8px 32px; }
+  .bracket-wrap { min-width: 900px; }
+}
+</style>
+</head>
+<body>
+
+<h1>Chaveamento Copa do Mundo 2026</h1>
+<p class="subtitulo" id="atualizado">Carregando dados...</p>
+
+<div class="scroll">
+  <div class="bracket-wrap" id="bracket">
+    <div style="grid-column:1;grid-row:1" class="fase-titulo">16-avos</div>
+    <div style="grid-column:2;grid-row:1" class="fase-titulo">Oitavas</div>
+    <div style="grid-column:3;grid-row:1" class="fase-titulo">Quartas</div>
+    <div style="grid-column:4;grid-row:1" class="fase-titulo">Semifinal</div>
+    <div style="grid-column:5;grid-row:1" class="fase-titulo">Final</div>
+    <div style="grid-column:6;grid-row:1" class="fase-titulo">Semifinal</div>
+    <div style="grid-column:7;grid-row:1" class="fase-titulo">Quartas</div>
+    <div style="grid-column:8;grid-row:1" class="fase-titulo">Oitavas</div>
+    <div style="grid-column:9;grid-row:1" class="fase-titulo">16-avos</div>
+  </div>
+</div>
+
+<div class="legenda">
+  Probabilidades calculadas pelo modelo zero-prior (Elo + Ataque/Defesa) · Dados: API-Football
+</div>
+
+<script src="data-loader.js"></script>
+<script>
+const APPS_SCRIPT_URL_BRACKET = typeof APPS_SCRIPT_URL !== 'undefined' ? APPS_SCRIPT_URL : '';
+
+// ── ISO bandeiras ──
+const FLAG_ISO = {
+  'México':'mx','Coreia do Sul':'kr','República Tcheca':'cz','África do Sul':'za',
+  'Bósnia e Herzegovina':'ba','Canadá':'ca','Catar':'qa','Suíça':'ch',
+  'Escócia':'gb-sct','Brasil':'br','Marrocos':'ma','Haiti':'ht',
+  'Estados Unidos':'us','Austrália':'au','Turquia':'tr','Paraguai':'py',
+  'Alemanha':'de','Costa do Marfim':'ci','Equador':'ec','Curaçao':'cw',
+  'Suécia':'se','Holanda':'nl','Japão':'jp','Tunísia':'tn',
+  'Irã':'ir','Nova Zelândia':'nz','Bélgica':'be','Egito':'eg',
+  'Arábia Saudita':'sa','Uruguai':'uy','Cabo Verde':'cv','Espanha':'es',
+  'França':'fr','Iraque':'iq','Noruega':'no','Senegal':'sn',
+  'Argélia':'dz','Argentina':'ar','Áustria':'at','Jordânia':'jo',
+  'Colômbia':'co','Portugal':'pt','República Democrática do Congo':'cd','Uzbequistão':'uz',
+  'Croácia':'hr','Gana':'gh','Inglaterra':'gb-eng','Panamá':'pa'
+};
+
+const COR_GRUPO = {
+  'A':'#E8B931','B':'#6FAE8C','C':'#C1432A','D':'#7CA8C9',
+  'E':'#D98E4A','F':'#A06CC2','G':'#5FB8B0','H':'#D4566B',
+  'I':'#8BAE3E','J':'#C77DD1','K':'#E8D031','L':'#5FAEAE'
+};
+
+// ── Chaveamento oficial FIFA Copa 2026 ──
+// Lado esquerdo (colunas 1-4) + Lado direito (colunas 9-6)
+const LADO_ESQ = {
+  '16avos': [
+    { id:'J74', a:'1º Grupo E', b:'3º A/B/C/D/F', data:'29/06' },
+    { id:'J77', a:'1º Grupo I', b:'3º C/D/F/G/H', data:'30/06' },
+    { id:'J73', a:'2º Grupo A', b:'2º Grupo B',   data:'28/06' },
+    { id:'J75', a:'1º Grupo F', b:'2º Grupo C',   data:'30/06' },
+    { id:'J83', a:'2º Grupo K', b:'2º Grupo L',   data:'02/07' },
+    { id:'J84', a:'1º Grupo H', b:'2º Grupo J',   data:'02/07' },
+    { id:'J81', a:'1º Grupo D', b:'3º B/E/F/I/J', data:'02/07' },
+    { id:'J82', a:'1º Grupo G', b:'3º A/E/H/I/J', data:'01/07' },
+  ],
+  'oitavas': [
+    { id:'J89', a:'Venc. J74', b:'Venc. J77', data:'04/07' },
+    { id:'J90', a:'Venc. J73', b:'Venc. J75', data:'04/07' },
+    { id:'J93', a:'Venc. J83', b:'Venc. J84', data:'06/07' },
+    { id:'J94', a:'Venc. J81', b:'Venc. J82', data:'06/07' },
+  ],
+  'quartas': [
+    { id:'J97', a:'Venc. J89', b:'Venc. J90', data:'09/07' },
+    { id:'J98', a:'Venc. J93', b:'Venc. J94', data:'10/07' },
+  ],
+  'semi': [
+    { id:'J101', a:'Venc. J97', b:'Venc. J98', data:'14/07' },
+  ],
+};
+
+const LADO_DIR = {
+  '16avos': [
+    { id:'J76', a:'1º Grupo C', b:'2º Grupo F',   data:'29/06' },
+    { id:'J78', a:'2º Grupo E', b:'2º Grupo I',   data:'30/06' },
+    { id:'J79', a:'1º Grupo A', b:'3º C/E/F/H/I', data:'01/07' },
+    { id:'J80', a:'1º Grupo L', b:'3º E/H/I/J/K', data:'01/07' },
+    { id:'J86', a:'1º Grupo J', b:'2º Grupo H',   data:'03/07' },
+    { id:'J88', a:'2º Grupo D', b:'2º Grupo G',   data:'03/07' },
+    { id:'J85', a:'1º Grupo B', b:'3º E/F/G/I/J', data:'03/07' },
+    { id:'J87', a:'1º Grupo K', b:'3º D/E/I/J/L', data:'04/07' },
+  ],
+  'oitavas': [
+    { id:'J91', a:'Venc. J76', b:'Venc. J78', data:'05/07' },
+    { id:'J92', a:'Venc. J79', b:'Venc. J80', data:'05/07' },
+    { id:'J95', a:'Venc. J86', b:'Venc. J88', data:'07/07' },
+    { id:'J96', a:'Venc. J85', b:'Venc. J87', data:'07/07' },
+  ],
+  'quartas': [
+    { id:'J99',  a:'Venc. J91', b:'Venc. J92', data:'11/07' },
+    { id:'J100', a:'Venc. J95', b:'Venc. J96', data:'11/07' },
+  ],
+  'semi': [
+    { id:'J102', a:'Venc. J99', b:'Venc. J100', data:'15/07' },
+  ],
+};
+
+const FINAL = { id:'J104', a:'Venc. J101', b:'Venc. J102', data:'19/07' };
+
+// ── Utilitários ──
+function flag(nome) {
+  const iso = FLAG_ISO[nome];
+  return iso ? `<img src="https://flagcdn.com/16x12/${iso}.png" style="vertical-align:middle;flex-shrink:0;">` : '<span style="width:16px;display:inline-block;"></span>';
+}
+
+function calcProb(dados, nA, nB) {
+  const tA = dados.times.find(t => t.time === nA);
+  const tB = dados.times.find(t => t.time === nB);
+  if (!tA || !tB) return null;
+  const gA = (parseFloat(tA.ataque) + parseFloat(tB.defesa)) / 2;
+  const gB = (parseFloat(tB.ataque) + parseFloat(tA.defesa)) / 2;
+  const pA = 1 / (1 + Math.exp(-1.3 * (gA - gB)));
+  return { pA, pB: 1-pA, gA, gB };
+}
+
+function renderTime(dados, slot, placar, isVencedor, isEliminado) {
+  const t = dados.times.find(x => x.time === slot);
+  const cls = isVencedor ? 'vencedor' : isEliminado ? 'eliminado' : t ? '' : 'pendente';
+  const nome = t ? slot : `<em>${slot}</em>`;
+  const fg = t ? flag(slot) : '<span style="width:16px;display:inline-block;"></span>';
+  const placarHtml = (placar !== undefined && placar !== null && placar !== '')
+    ? `<span class="placar">${placar}</span>` : '';
+  return `<div class="time-linha">${fg}<span class="time-nome ${cls}">${nome}</span>${placarHtml}</div>`;
+}
+
+function criarJogo(dados, jogo, invertido) {
+  const div = document.createElement('div');
+  div.className = 'jogo';
+
+  const tA = dados.times.find(x => x.time === jogo.a);
+  const tB = dados.times.find(x => x.time === jogo.b);
+  const prob = tA && tB ? calcProb(dados, jogo.a, jogo.b) : null;
+
+  const corA = tA ? (COR_GRUPO[tA.grupo] || '#E8B931') : '#E8B931';
+  const corB = tB ? (COR_GRUPO[tB.grupo] || '#7CA8C9') : '#7CA8C9';
+
+  const nA = renderTime(dados, jogo.a, jogo.golsA, jogo.vencedor === jogo.a, jogo.vencedor && jogo.vencedor !== jogo.a);
+  const nB = renderTime(dados, jogo.b, jogo.golsB, jogo.vencedor === jogo.b, jogo.vencedor && jogo.vencedor !== jogo.b);
+
+  let probHtml = '';
+  if (prob) {
+    const pA = Math.round(prob.pA * 100);
+    probHtml = `
+      <div class="prob-bar">
+        <div class="prob-fill-a" style="width:${pA}%;background:${corA};opacity:0.7;"></div>
+        <div class="prob-fill-b" style="flex:1;background:${corB};opacity:0.7;"></div>
+      </div>
+      <div class="prob-txt"><span>${pA}%</span><span>${jogo.data}</span><span>${100-pA}%</span></div>
+    `;
+  } else {
+    probHtml = `<div class="prob-txt" style="justify-content:center;margin-top:4px;">${jogo.data}</div>`;
+  }
+
+  const ttHtml = prob ? `
+    <div class="tt">
+      <div style="color:#E8B931;font-weight:700;margin-bottom:6px">${jogo.id} · ${jogo.data}</div>
+      <div>${jogo.a}: <b>${Math.round(prob.pA*100)}%</b> · ${prob.gA.toFixed(2)} gols esp.</div>
+      <div>${jogo.b}: <b>${Math.round(prob.pB*100)}%</b> · ${prob.gB.toFixed(2)} gols esp.</div>
+    </div>` : '';
+
+  div.innerHTML = `<div class="jogo-id">${jogo.id}</div>${nA}${nB}${probHtml}${ttHtml}`;
+  return div;
+}
+
+function criarColuna(dados, jogos, gridCol, gridRow) {
+  const col = document.createElement('div');
+  col.className = 'col-slots';
+  col.style.gridColumn = gridCol;
+  col.style.gridRow = gridRow || '2';
+  jogos.forEach(j => col.appendChild(criarJogo(dados, j)));
+  return col;
+}
+
+function montarBracket(dados) {
+  const bracket = document.getElementById('bracket');
+
+  // Remover colunas antigas (mantém cabeçalhos na row 1)
+  bracket.querySelectorAll('.col-slots, .final-wrap').forEach(el => el.remove());
+
+  // ── Lado esquerdo ──
+  bracket.appendChild(criarColuna(dados, LADO_ESQ['16avos'], 1));
+  bracket.appendChild(criarColuna(dados, LADO_ESQ['oitavas'], 2));
+  bracket.appendChild(criarColuna(dados, LADO_ESQ['quartas'], 3));
+  bracket.appendChild(criarColuna(dados, LADO_ESQ['semi'], 4));
+
+  // ── FINAL no centro ──
+  const finalWrap = document.createElement('div');
+  finalWrap.className = 'final-wrap';
+  finalWrap.style.gridRow = '2';
+  finalWrap.innerHTML = '<div class="trofeu">🏆</div><div class="final-titulo">Final · 19/07</div>';
+  finalWrap.appendChild(criarJogo(dados, FINAL));
+  bracket.appendChild(finalWrap);
+
+  // ── Lado direito (invertido) ──
+  bracket.appendChild(criarColuna(dados, LADO_DIR['semi'], 6));
+  bracket.appendChild(criarColuna(dados, LADO_DIR['quartas'], 7));
+  bracket.appendChild(criarColuna(dados, LADO_DIR['oitavas'], 8));
+  bracket.appendChild(criarColuna(dados, LADO_DIR['16avos'], 9));
+
+  // Atualizar subtítulo
+  const d = new Date(dados.atualizadoEm);
+  document.getElementById('atualizado').textContent =
+    'Atualizado em ' + d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'}) +
+    ' · ' + dados.times.length + ' seleções · Modelo zero-prior';
+}
+
+// ── Iniciar ──
+carregarDados().then(dados => {
+  montarBracket(dados);
+});
+</script>
+</body>
+</html>
