@@ -40,7 +40,15 @@ async function montarDispersao(d){
   let tt=document.getElementById('tt-d');
   if(!tt){tt=document.createElement('div');tt.id='tt-d';tt.style.cssText='position:absolute;pointer-events:none;display:none;z-index:99;background:#0d1117;border:1px solid rgba(251,191,36,.4);border-radius:6px;padding:8px 12px;font-size:12px;color:#f3f4f6;white-space:nowrap;';wrap.appendChild(tt);}
 
-  const pts=d.times.map(t=>({x:parseFloat(t.ataque)||1.35,y:parseFloat(t.defesa)>0?(3-parseFloat(t.defesa)):1.65,label:t.time,grupo:t.grupo,rating:Math.round(parseFloat(t.rating))||1500}));
+  const pts=d.times.map(t=>{
+    const atq=parseFloat(t.ataque)||1.35;
+    const def=parseFloat(t.defesa)||1.35;
+    const semDados=(Math.abs(atq-1.35)<0.001 && Math.abs(def-1.35)<0.001);
+    // Jitter pequeno para times sem dados reais (evitar sobreposição)
+    const jx=semDados?(Math.random()-0.5)*0.04:0;
+    const jy=semDados?(Math.random()-0.5)*0.04:0;
+    return{x:atq+jx,y:def>0?(3-def)+jy:1.65,label:t.time,grupo:t.grupo,rating:Math.round(parseFloat(t.rating))||1500,semDados};
+  });
 
   const plugin={id:'flags',afterDatasetsDraw(chart){
     const{ctx:c,scales,chartArea}=chart;
@@ -48,8 +56,19 @@ async function montarDispersao(d){
     pts.forEach(p=>{
       const px=scales.x.getPixelForValue(p.x),py=scales.y.getPixelForValue(p.y);
       const img=imgCache[p.label];
-      if(img){c.drawImage(img,px-11,py-8,22,17);}
-      else{c.fillStyle=COR_GRUPO[p.grupo]||'#6b7280';c.beginPath();c.arc(px,py,8,0,Math.PI*2);c.fill();c.fillStyle='#fff';c.font='bold 7px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(SIGLAS[p.label]||p.label.slice(0,3),px,py);}
+      if(p.semDados){
+        // Times sem dados: círculo cinza pequeno com sigla
+        c.globalAlpha=0.35;
+        c.fillStyle='#9ca3af';c.beginPath();c.arc(px,py,7,0,Math.PI*2);c.fill();
+        c.globalAlpha=1;c.fillStyle='#fff';c.font='bold 6px sans-serif';c.textAlign='center';c.textBaseline='middle';
+        c.fillText(SIGLAS[p.label]||p.label.slice(0,3),px,py);
+      } else if(img){
+        c.globalAlpha=1;c.drawImage(img,px-11,py-8,22,17);
+      } else {
+        c.globalAlpha=1;c.fillStyle=COR_GRUPO[p.grupo]||'#6b7280';c.beginPath();c.arc(px,py,9,0,Math.PI*2);c.fill();
+        c.fillStyle='#fff';c.font='bold 7px sans-serif';c.textAlign='center';c.textBaseline='middle';
+        c.fillText(SIGLAS[p.label]||p.label.slice(0,3),px,py);
+      }
     });
     c.restore();
   }};
