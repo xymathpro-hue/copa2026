@@ -12,7 +12,7 @@ const SCALE_Y=(title)=>({title:{display:true,text:title,color:'#9ca3af',font:{si
 const TT=(extra={})=>Object.assign({backgroundColor:'#0d1117',titleColor:'#fbbf24',bodyColor:'#f3f4f6',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:10,cornerRadius:6},extra);
 
 function flagUrl(n){const i=FLAG_ISO[n];return i?`https://flagcdn.com/20x15/${i}.png`:null;}
-function preloadFlags(times){return Promise.all(times.map(t=>new Promise(r=>{const u=flagUrl(t.time);if(!u||imgCache[t.time])return r();const i=new Image();i.crossOrigin='anonymous';i.onload=()=>{imgCache[t.time]=i;r();};i.onerror=r;i.src=u;})));}
+function preloadFlags(times){return Promise.all(times.map(t=>new Promise(r=>{const u=flagUrl(t.time);if(!u||imgCache[t.time])return r();const i=new Image();i.onload=()=>{imgCache[t.time]=i;r();};i.onerror=r;i.src=u;})));}
 
 /* ── 01 Evolução ── */
 function serieRating(motor,nome){
