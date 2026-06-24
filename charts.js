@@ -397,12 +397,12 @@ function preencherStatus(d){
   document.getElementById('stat-atualizado').textContent=dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
 }
 
-// ── Agregar estatísticas por time ──
+// ── Agregar estatísticas — usa dados do servidor se disponíveis ──
 function agregarEstatisticas(d){
+  // Se o servidor já enviou estatísticas, usa direto
+  if(d.estatisticas && Object.keys(d.estatisticas).length>0) return d.estatisticas;
+  // Fallback: calcula gols pró/contra a partir do motor
   const est={};
-  if(!d.simulacoes)return est;
-  // Usar aba Estatísticas Extras se disponível no JSON
-  // Por ora calcula a partir do motor (gols pró/contra)
   d.times.forEach(t=>{
     const jogos=d.motor.filter(j=>j.timeA===t.time||j.timeB===t.time);
     if(jogos.length===0){est[t.time]={};return;}
