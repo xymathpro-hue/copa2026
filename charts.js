@@ -223,7 +223,7 @@ function montarTabDominio(d){
       <td><span class="gbadge">${t.grupo}</span></td>
       <td class="r" style="color:#3b82f6;font-weight:700">${e.posse!=null?e.posse.toFixed(0)+'%':'—'}</td>
       <td class="r">${e.passes!=null?e.passes.toFixed(0):'—'}</td>
-      <td class="r">${e.precisaoPasse!=null?e.precisaoPasse.toFixed(0)+'%':'—'}</td>
+      <td class="r">${e.precisao!=null?e.precisao.toFixed(0)+'%':'—'}</td>
     </tr>`;
   }).join('');
 }
@@ -250,7 +250,9 @@ function montarTabEficiencia(d){
 function montarTabDisciplina(d){
   const times=filtrarTimes(d);
   const est=d.estatisticas||{};
-  const ord=[...times].sort((a,b)=>((est[b.time]||{}).faltas||0)-((est[a.time]||{}).faltas||0));
+  const comFaltas=times.filter(t=>(est[t.time]||{}).faltas!=null);
+  const semFaltas=times.filter(t=>(est[t.time]||{}).faltas==null);
+  const ord=[...comFaltas].sort((a,b)=>((est[b.time]||{}).faltas||0)-((est[a.time]||{}).faltas||0)).concat(semFaltas);
   document.querySelector('#tbl-disciplina tbody').innerHTML=ord.map((t,i)=>{
     const e=est[t.time]||{};
     return`<tr onclick="abrirPerfil('${t.time.replace(/'/g,"\\'")}')">
@@ -258,8 +260,8 @@ function montarTabDisciplina(d){
       <td><div class="tc">${flag16(t.time)} ${t.time}</div></td>
       <td><span class="gbadge">${t.grupo}</span></td>
       <td class="r" style="color:#ef4444;font-weight:700">${e.faltas!=null?e.faltas.toFixed(1):'—'}</td>
-      <td class="r">${e.cartoesAm!=null?e.cartoesAm:'—'}</td>
-      <td class="r">${e.cartoesVm!=null?e.cartoesVm:'—'}</td>
+      <td class="r">${e.cartoes!=null?e.cartoes.toFixed(1):'—'}</td>
+      <td class="r">${e.chutesGol!=null?e.chutesGol.toFixed(1):'—'}</td>
     </tr>`;
   }).join('');
 }
