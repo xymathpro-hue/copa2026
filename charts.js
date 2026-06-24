@@ -148,16 +148,25 @@ function filtrarTimes(d){
 function montarTabGeral(d){
   const times=filtrarTimes(d);
   const mn=Math.min(...d.times.map(t=>t.rating)),mx=Math.max(...d.times.map(t=>t.rating));
-  const ord=[...times].sort((a,b)=>b.rating-a.rating);
+  const ord=[...times].sort((a,b)=>{
+    const ra=parseFloat(a.rating),rb=parseFloat(b.rating);
+    if(Math.abs(rb-ra)>0.01)return rb-ra;
+    // Desempate 1: ataque
+    const da=parseFloat(b.ataque)-parseFloat(a.ataque);
+    if(Math.abs(da)>0.001)return da;
+    // Desempate 2: defesa (menor = melhor)
+    return parseFloat(a.defesa)-parseFloat(b.defesa);
+  });
   document.querySelector('#tbl-geral tbody').innerHTML=ord.map((t,i)=>{
-    const pct=mx>mn?Math.round((t.rating-mn)/(mx-mn)*100):50;
+    const r=parseFloat(t.rating);
+    const pct=mx>mn?Math.round((r-mn)/(mx-mn)*100):50;
     const cont=CONT[t.time]||'—';
     return`<tr onclick="abrirPerfil('${t.time.replace(/'/g,"\\'")}')">
       <td class="rk">${i+1}</td>
       <td><div class="tc">${flag16(t.time)} ${t.time}</div></td>
       <td><span class="gbadge">${t.grupo}</span></td>
       <td style="font-size:11px;color:#6b7280">${cont}</td>
-      <td class="r">${Math.round(t.rating)}<span class="rbar"><span class="rbar-fill" style="width:${pct}%"></span></span></td>
+      <td class="r">${r.toFixed(1)}<span class="rbar"><span class="rbar-fill" style="width:${pct}%"></span></span></td>
       <td class="r">${parseFloat(t.ataque).toFixed(2)}</td>
       <td class="r">${parseFloat(t.defesa).toFixed(2)}</td>
     </tr>`;
@@ -304,7 +313,7 @@ function abrirPerfil(nome){
   document.getElementById('modal-title').innerHTML=`${fg} ${nome} <span style="font-size:12px;color:#6b7280;font-family:Inter,sans-serif;font-weight:400">· ${CONT[nome]||''} · Grupo ${t.grupo}</span>`;
   document.getElementById('modal-body').innerHTML=`
     <div class="stat-grid">
-      <div class="stat-box"><div class="stat-box-v" style="color:#f59e0b">${Math.round(t.rating)}</div><div class="stat-box-l">Rating Elo</div></div>
+      <div class="stat-box"><div class="stat-box-v" style="color:#f59e0b">${parseFloat(t.rating).toFixed(1)}</div><div class="stat-box-l">Rating Elo</div></div>
       <div class="stat-box"><div class="stat-box-v">${parseFloat(t.ataque).toFixed(2)}</div><div class="stat-box-l">Ataque</div></div>
       <div class="stat-box"><div class="stat-box-v">${parseFloat(t.defesa).toFixed(2)}</div><div class="stat-box-l">Defesa</div></div>
       <div class="stat-box"><div class="stat-box-v">${jogosT.length}</div><div class="stat-box-l">Jogos</div></div>
