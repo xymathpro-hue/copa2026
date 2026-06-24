@@ -4,7 +4,7 @@
  * ===================================================================
  */
 
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQG0mocmJwoi874RP5AtEdXrnzP99YbTvBNqKbBl5k1WUos5W4AIHDJYagn_iCNPtr/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxa_QVCu96hqpCsSW3wrGq37pI1k__lFZpyJyqIwkVBjs0A6z4rqjkNqyQp212OGTlYnA/exec';
 
 // Dados de exemplo usados como fallback se a busca falhar
 const DADOS_EXEMPLO = {
