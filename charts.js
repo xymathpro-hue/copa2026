@@ -261,7 +261,7 @@ function montarTabDisciplina(d){
       <td><span class="gbadge">${t.grupo}</span></td>
       <td class="r" style="color:#ef4444;font-weight:700">${e.faltas!=null?e.faltas.toFixed(1):'—'}</td>
       <td class="r">${e.cartoes!=null?e.cartoes.toFixed(1):'—'}</td>
-      <td class="r">${e.chutesGol!=null?e.chutesGol.toFixed(1):'—'}</td>
+      <td class="r">${e.cartoesVm!=null?e.cartoesVm.toFixed(1):'—'}</td>
     </tr>`;
   }).join('');
 }
