@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -294,21 +294,46 @@ function montarClassificacao(dados) {
     grupos[t.grupo].push(t);
   });
   Object.keys(grupos).sort().forEach(function(g){
-    var lista = grupos[g].slice().sort(function(a,b){ return b.rating - a.rating; });
+    // Calcular pts/sg/gm a partir do motor
+    var statsTimes = {};
+    (dados.motor || []).forEach(function(j) {
+      ['timeA','timeB'].forEach(function(lado) {
+        var t = j[lado], gPro = lado==='timeA'?j.golsA:j.golsB, gCon = lado==='timeA'?j.golsB:j.golsA;
+        if (!t) return;
+        if (!statsTimes[t]) statsTimes[t] = {pts:0,sg:0,gm:0,j:0};
+        statsTimes[t].j++;
+        statsTimes[t].gm += (gPro||0);
+        statsTimes[t].sg += (gPro||0) - (gCon||0);
+        if (gPro > gCon) statsTimes[t].pts += 3;
+        else if (gPro === gCon) statsTimes[t].pts += 1;
+      });
+    });
+    var lista = grupos[g].slice().sort(function(a,b){
+      var sA = statsTimes[a.time]||{pts:0,sg:0,gm:0};
+      var sB = statsTimes[b.time]||{pts:0,sg:0,gm:0};
+      if (sB.pts !== sA.pts) return sB.pts - sA.pts;
+      if (sB.sg  !== sA.sg)  return sB.sg  - sA.sg;
+      if (sB.gm  !== sA.gm)  return sB.gm  - sA.gm;
+      return b.rating - a.rating;
+    });
     var rows = lista.map(function(t, i){
       var iso = FLAG_ISO[t.time];
       var fg = iso ? '<img src="https://flagcdn.com/16x12/'+iso+'.png" style="border-radius:1px;">' : '';
       var mm = i < 2 ? '<span style="color:#10b981;font-weight:700;font-size:0.7rem;">✓</span>' : '';
+      var st = statsTimes[t.time]||{pts:0,sg:0,gm:0,j:0};
       return '<tr><td><span class="pos-badge pos-'+(i+1)+'">'+(i+1)+'</span>'+fg+' '+t.time+'</td>'
         +'<td>'+mm+'</td>'
-        +'<td style="font-weight:600">'+Math.round(t.rating)+'</td>'
-        +'<td>'+parseFloat(t.ataque).toFixed(2)+'</td>'
-        +'<td>'+parseFloat(t.defesa).toFixed(2)+'</td></tr>';
+        +'<td style="font-weight:700">'+st.pts+'</td>'
+        +'<td>'+st.j+'</td>'
+        +'<td>'+(st.sg>0?'+':'')+st.sg+'</td>'
+        +'<td>'+st.gm+'</td>'
+        +'<td style="color:#94a3b8;font-size:0.72rem">'+Math.round(t.rating)+'</td>'
+        +'</tr>';
     }).join('');
     var card = document.createElement('div');
     card.className = 'grupo-card';
     card.innerHTML = '<div class="grupo-header">Grupo '+g+'</div>'
-      +'<table class="grupo-table"><thead><tr><th>Seleção</th><th>MM</th><th>Rating</th><th>Atq</th><th>Def</th></tr></thead>'
+      +'<table class="grupo-table"><thead><tr><th>Seleção</th><th>MM</th><th>Pts</th><th>J</th><th>SG</th><th>GM</th><th>Elo</th></tr></thead>'
       +'<tbody>'+rows+'</tbody></table>';
     container.appendChild(card);
   });
