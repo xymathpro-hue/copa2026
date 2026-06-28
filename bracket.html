@@ -15,7 +15,6 @@ body {
   padding: 0 0 60px;
 }
 
-/* ── Navegação global ── */
 .topnav {
   background: #1a2332;
   display: flex;
@@ -42,23 +41,14 @@ body {
 .topnav-link:hover { color: #ffffff; background: rgba(255,255,255,0.1); }
 .topnav-link.ativo { color: #E8B931; background: rgba(232,185,49,0.12); font-weight: 600; }
 
-/* ── Header da página ── */
 .header {
   background: #1a2332;
   padding: 16px 24px 14px;
   border-bottom: 3px solid #E8B931;
 }
-
-.header h1 {
-  font-size: 1.1rem;
-  color: #ffffff;
-  font-family: Georgia, serif;
-  font-weight: 700;
-}
-
+.header h1 { font-size: 1.1rem; color: #ffffff; font-family: Georgia, serif; font-weight: 700; }
 .header-meta { font-size: 0.73rem; color: rgba(255,255,255,0.5); margin-top: 2px; }
 
-/* ── Tabs ── */
 .tabs {
   display: flex;
   border-bottom: 2px solid #e2e8f0;
@@ -66,7 +56,6 @@ body {
   background: #ffffff;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
-
 .tab {
   padding: 12px 20px;
   font-size: 0.82rem;
@@ -84,13 +73,11 @@ body {
 .painel { display: none; padding: 24px; }
 .painel.ativo { display: block; }
 
-/* ── Classificação ── */
 .grupos-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 16px;
 }
-
 .grupo-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
@@ -98,7 +85,6 @@ body {
   overflow: hidden;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
-
 .grupo-header {
   background: #1a2332;
   color: #E8B931;
@@ -108,28 +94,17 @@ body {
   text-transform: uppercase;
   padding: 8px 14px;
 }
-
 .grupo-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
-
 .grupo-table th {
-  color: #94a3b8;
-  font-size: 0.64rem;
-  text-transform: uppercase;
-  padding: 6px 8px;
-  text-align: center;
-  border-bottom: 1px solid #f1f5f9;
-  background: #f8fafc;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  color: #94a3b8; font-size: 0.64rem; text-transform: uppercase;
+  padding: 6px 8px; text-align: center;
+  border-bottom: 1px solid #f1f5f9; background: #f8fafc;
+  font-weight: 600; letter-spacing: 0.04em;
 }
 .grupo-table th:first-child { text-align: left; padding-left: 14px; }
-
 .grupo-table td {
-  padding: 7px 8px;
-  text-align: center;
-  border-bottom: 1px solid #f1f5f9;
-  color: #1a2332;
-  font-size: 0.78rem;
+  padding: 7px 8px; text-align: center;
+  border-bottom: 1px solid #f1f5f9; color: #1a2332; font-size: 0.78rem;
 }
 .grupo-table td:first-child {
   text-align: left; padding-left: 14px;
@@ -137,7 +112,6 @@ body {
 }
 .grupo-table tr:last-child td { border-bottom: none; }
 .grupo-table tr:hover td { background: #f8fafc; }
-
 .pos-badge {
   width: 20px; height: 20px; border-radius: 4px;
   display: inline-flex; align-items: center; justify-content: center;
@@ -148,93 +122,43 @@ body {
 .pos-3 { background: #e2e8f0; color: #64748b; }
 .pos-4 { background: #fee2e2; color: #ef4444; }
 
-/* ── Bracket ── */
 .bracket-scroll { overflow-x: auto; padding: 0 24px 16px; }
-
 .bracket-grid {
   display: grid;
   grid-template-columns: 175px 155px 130px 120px 145px 120px 130px 155px 175px;
   gap: 0 6px;
   min-width: 1300px;
 }
-
 .fase-col-titulo {
-  font-size: 0.62rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #64748b;
-  text-align: center;
-  padding: 10px 0 10px;
-  font-weight: 700;
-  grid-row: 1;
-  border-bottom: 2px solid #e2e8f0;
+  font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em;
+  color: #64748b; text-align: center; padding: 10px 0 10px;
+  font-weight: 700; grid-row: 1; border-bottom: 2px solid #e2e8f0;
 }
-
 .col-jogos {
   display: flex; flex-direction: column;
   justify-content: space-around;
   grid-row: 2; padding: 4px 0;
 }
-
-/* ── Cartão ── */
 .jogo-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  padding: 7px 9px;
-  margin: 3px 0;
-  cursor: default;
+  background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px;
+  padding: 7px 9px; margin: 3px 0; cursor: default;
   transition: border-color 0.15s, box-shadow 0.15s;
-  position: relative;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  position: relative; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
-.jogo-card:hover {
-  border-color: #E8B931;
-  box-shadow: 0 2px 8px rgba(232,185,49,0.2);
-}
-
-.jogo-num {
-  font-size: 0.58rem; color: #94a3b8;
-  text-align: right; margin-bottom: 4px;
-  letter-spacing: 0.04em; font-weight: 600;
-}
-
-.time-row {
-  display: flex; align-items: center;
-  gap: 6px; padding: 2px 0;
-}
+.jogo-card:hover { border-color: #E8B931; box-shadow: 0 2px 8px rgba(232,185,49,0.2); }
+.jogo-num { font-size: 0.58rem; color: #94a3b8; text-align: right; margin-bottom: 4px; letter-spacing: 0.04em; font-weight: 600; }
+.time-row { display: flex; align-items: center; gap: 6px; padding: 2px 0; }
 .time-row img { flex-shrink: 0; border-radius: 1px; }
-
-.time-txt {
-  font-size: 0.76rem; color: #334155;
-  flex: 1; white-space: nowrap;
-  overflow: hidden; text-overflow: ellipsis;
-  font-weight: 500;
-}
+.time-txt { font-size: 0.76rem; color: #334155; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
 .time-txt.vencedor { color: #1a2332; font-weight: 800; }
 .time-txt.eliminado { color: #cbd5e1; text-decoration: line-through; font-weight: 400; }
 .time-txt.slot { color: #94a3b8; font-style: italic; font-size: 0.67rem; font-weight: 400; }
-
-.placar-num {
-  font-size: 0.76rem; font-weight: 800;
-  color: #1a2332; min-width: 14px; text-align: right;
-}
-
+.placar-num { font-size: 0.76rem; font-weight: 800; color: #1a2332; min-width: 14px; text-align: right; }
 .prob-wrap { margin-top: 5px; }
-.prob-bar {
-  height: 4px; border-radius: 2px;
-  display: flex; overflow: hidden;
-  background: #f1f5f9;
-}
+.prob-bar { height: 4px; border-radius: 2px; display: flex; overflow: hidden; background: #f1f5f9; }
 .pb-a { height: 100%; }
 .pb-b { height: 100%; }
-.prob-nums {
-  display: flex; justify-content: space-between;
-  font-size: 0.59rem; color: #94a3b8; margin-top: 2px;
-  font-weight: 600;
-}
-
-/* FINAL */
+.prob-nums { display: flex; justify-content: space-between; font-size: 0.59rem; color: #94a3b8; margin-top: 2px; font-weight: 600; }
 .final-col {
   grid-column: 5; grid-row: 2;
   display: flex; flex-direction: column;
@@ -242,30 +166,16 @@ body {
   padding: 0 4px; gap: 6px;
 }
 .trofeu { font-size: 2rem; text-align: center; }
-.final-titulo {
-  font-size: 0.65rem; text-transform: uppercase;
-  letter-spacing: 0.12em; color: #1a2332;
-  font-weight: 800; text-align: center;
-}
-
-/* tooltip */
+.final-titulo { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: #1a2332; font-weight: 800; text-align: center; }
 .tt {
   display: none; position: absolute; z-index: 60;
-  left: 105%; top: 0;
-  background: #1a2332;
-  border: 1px solid #334155;
-  border-radius: 6px; padding: 10px 14px;
+  left: 105%; top: 0; background: #1a2332;
+  border: 1px solid #334155; border-radius: 6px; padding: 10px 14px;
   font-size: 0.76rem; white-space: nowrap;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-  min-width: 210px; color: #f1f5f9;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2); min-width: 210px; color: #f1f5f9;
 }
 .jogo-card:hover .tt { display: block; }
-
-.legenda {
-  text-align: center; font-size: 0.72rem;
-  color: #94a3b8; margin-top: 20px;
-  padding: 0 24px;
-}
+.legenda { text-align: center; font-size: 0.72rem; color: #94a3b8; margin-top: 20px; padding: 0 24px; }
 </style>
 </head>
 <body>
@@ -353,10 +263,10 @@ const ESQ_16 = [
   {id:'J81',a:'1D',b:'3BEFIJ',data:'02/07'},
   {id:'J82',a:'1G',b:'3AEHIJ',data:'01/07'},
 ];
-const ESQ_8   = [{id:'J89',a:'WJ74',b:'WJ77',data:'04/07'},{id:'J90',a:'WJ73',b:'WJ75',data:'04/07'},{id:'J93',a:'WJ83',b:'WJ84',data:'06/07'},{id:'J94',a:'WJ81',b:'WJ82',data:'06/07'}];
-const ESQ_4   = [{id:'J97',a:'WJ89',b:'WJ90',data:'09/07'},{id:'J98',a:'WJ93',b:'WJ94',data:'10/07'}];
-const ESQ_S   = [{id:'J101',a:'WJ97',b:'WJ98',data:'14/07'}];
-const DIR_16  = [
+const ESQ_8  = [{id:'J89',a:'WJ74',b:'WJ77',data:'04/07'},{id:'J90',a:'WJ73',b:'WJ75',data:'04/07'},{id:'J93',a:'WJ83',b:'WJ84',data:'06/07'},{id:'J94',a:'WJ81',b:'WJ82',data:'06/07'}];
+const ESQ_4  = [{id:'J97',a:'WJ89',b:'WJ90',data:'09/07'},{id:'J98',a:'WJ93',b:'WJ94',data:'10/07'}];
+const ESQ_S  = [{id:'J101',a:'WJ97',b:'WJ98',data:'14/07'}];
+const DIR_16 = [
   {id:'J76',a:'1C',b:'2F',data:'29/06'},
   {id:'J78',a:'2E',b:'2I',data:'30/06'},
   {id:'J79',a:'1A',b:'3CEFHI',data:'01/07'},
@@ -366,16 +276,16 @@ const DIR_16  = [
   {id:'J85',a:'1B',b:'3EFGIJ',data:'03/07'},
   {id:'J87',a:'1K',b:'3DEIJL',data:'04/07'},
 ];
-const DIR_8   = [{id:'J91',a:'WJ76',b:'WJ78',data:'05/07'},{id:'J92',a:'WJ79',b:'WJ80',data:'05/07'},{id:'J95',a:'WJ86',b:'WJ88',data:'07/07'},{id:'J96',a:'WJ85',b:'WJ87',data:'07/07'}];
-const DIR_4   = [{id:'J99',a:'WJ91',b:'WJ92',data:'11/07'},{id:'J100',a:'WJ95',b:'WJ96',data:'11/07'}];
-const DIR_S   = [{id:'J102',a:'WJ99',b:'WJ100',data:'15/07'}];
-const FINAL   = {id:'J104',a:'WJ101',b:'WJ102',data:'19/07'};
+const DIR_8  = [{id:'J91',a:'WJ76',b:'WJ78',data:'05/07'},{id:'J92',a:'WJ79',b:'WJ80',data:'05/07'},{id:'J95',a:'WJ86',b:'WJ88',data:'07/07'},{id:'J96',a:'WJ85',b:'WJ87',data:'07/07'}];
+const DIR_4  = [{id:'J99',a:'WJ91',b:'WJ92',data:'11/07'},{id:'J100',a:'WJ95',b:'WJ96',data:'11/07'}];
+const DIR_S  = [{id:'J102',a:'WJ99',b:'WJ100',data:'15/07'}];
+const FINAL  = {id:'J104',a:'WJ101',b:'WJ102',data:'19/07'};
 
 function resolverSlot(slot, pos, res) {
   if (!slot) return null;
-  if (/^[12][A-L]$/.test(slot)) return pos[slot]||null;
-  if (/^3[A-L]+$/.test(slot)) return null;
-  if (/^WJ\d+$/.test(slot)) { var r=res[slot.slice(1)]; return r&&r.vencedor?r.vencedor:null; }
+  if (/^[12][A-L]$/.test(slot)) return pos[slot] || null;
+  if (/^3[A-L]+$/.test(slot)) return pos[slot] || null;  // ← CORRIGIDO
+  if (/^WJ\d+$/.test(slot)) { var r = res[slot.slice(1)]; return r && r.vencedor ? r.vencedor : null; }
   return null;
 }
 
@@ -387,109 +297,109 @@ function flag(nome) {
 }
 
 function calcProb(dados, nA, nB) {
-  var tA=dados.times.find(function(t){return t.time===nA;});
-  var tB=dados.times.find(function(t){return t.time===nB;});
-  if(!tA||!tB) return null;
-  var gA=(parseFloat(tA.ataque)+parseFloat(tB.defesa))/2;
-  var gB=(parseFloat(tB.ataque)+parseFloat(tA.defesa))/2;
-  var pA=1/(1+Math.exp(-1.3*(gA-gB)));
-  return {pA:pA,pB:1-pA,gA:gA,gB:gB};
+  var tA = dados.times.find(function(t){ return t.time === nA; });
+  var tB = dados.times.find(function(t){ return t.time === nB; });
+  if (!tA || !tB) return null;
+  var gA = (parseFloat(tA.ataque) + parseFloat(tB.defesa)) / 2;
+  var gB = (parseFloat(tB.ataque) + parseFloat(tA.defesa)) / 2;
+  var pA = 1 / (1 + Math.exp(-1.3 * (gA - gB)));
+  return { pA: pA, pB: 1 - pA, gA: gA, gB: gB };
 }
 
 function criarCard(dados, jogo) {
-  var pos=dados.posicoes||{}, res=dados.resultadosMM||{};
-  var nA=resolverSlot(jogo.a,pos,res), nB=resolverSlot(jogo.b,pos,res);
-  var r=res[jogo.id], venc=r?r.vencedor:null, gA=r?r.gA:null, gB=r?r.gB:null;
-  var tA=nA?dados.times.find(function(t){return t.time===nA;}):null;
-  var tB=nB?dados.times.find(function(t){return t.time===nB;}):null;
-  var prob=nA&&nB&&!r?calcProb(dados,nA,nB):null;
-  var corA=tA?(COR_GRUPO[tA.grupo]||'#64748b'):'#cbd5e1';
-  var corB=tB?(COR_GRUPO[tB.grupo]||'#94a3b8'):'#e2e8f0';
+  var pos = dados.posicoes || {}, res = dados.resultadosMM || {};
+  var nA = resolverSlot(jogo.a, pos, res), nB = resolverSlot(jogo.b, pos, res);
+  var r = res[jogo.id], venc = r ? r.vencedor : null, gA = r ? r.gA : null, gB = r ? r.gB : null;
+  var tA = nA ? dados.times.find(function(t){ return t.time === nA; }) : null;
+  var tB = nB ? dados.times.find(function(t){ return t.time === nB; }) : null;
+  var prob = nA && nB && !r ? calcProb(dados, nA, nB) : null;
+  var corA = tA ? (COR_GRUPO[tA.grupo] || '#64748b') : '#cbd5e1';
+  var corB = tB ? (COR_GRUPO[tB.grupo] || '#94a3b8') : '#e2e8f0';
 
-  function linha(nome,gols,isV,isE,slot) {
-    var cls=isV?'vencedor':isE?'eliminado':nome?'':'slot';
-    var txt=nome||(slot||'?');
-    var pl=(gols!==null&&gols!==undefined)?'<span class="placar-num">'+gols+'</span>':'';
-    return '<div class="time-row">'+flag(nome)+'<span class="time-txt '+cls+'">'+txt+'</span>'+pl+'</div>';
+  function linha(nome, gols, isV, isE, slot) {
+    var cls = isV ? 'vencedor' : isE ? 'eliminado' : nome ? '' : 'slot';
+    var txt = nome || (slot || '?');
+    var pl = (gols !== null && gols !== undefined) ? '<span class="placar-num">' + gols + '</span>' : '';
+    return '<div class="time-row">' + flag(nome) + '<span class="time-txt ' + cls + '">' + txt + '</span>' + pl + '</div>';
   }
 
-  var htmlA=linha(nA,gA,venc===nA,venc&&venc!==nA&&nA,jogo.a);
-  var htmlB=linha(nB,gB,venc===nB,venc&&venc!==nB&&nB,jogo.b);
+  var htmlA = linha(nA, gA, venc === nA, venc && venc !== nA && nA, jogo.a);
+  var htmlB = linha(nB, gB, venc === nB, venc && venc !== nB && nB, jogo.b);
 
-  var probHtml='';
-  if(prob){
-    var pA=Math.round(prob.pA*100);
-    probHtml='<div class="prob-wrap"><div class="prob-bar">'
-      +'<div class="pb-a" style="width:'+pA+'%;background:'+corA+';opacity:0.8;"></div>'
-      +'<div class="pb-b" style="flex:1;background:'+corB+';opacity:0.8;"></div>'
-      +'</div><div class="prob-nums"><span style="color:'+corA+'">'+pA+'%</span>'
-      +'<span style="color:#94a3b8">'+jogo.data+'</span>'
-      +'<span style="color:'+corB+'">'+(100-pA)+'%</span></div></div>';
+  var probHtml = '';
+  if (prob) {
+    var pA = Math.round(prob.pA * 100);
+    probHtml = '<div class="prob-wrap"><div class="prob-bar">'
+      + '<div class="pb-a" style="width:' + pA + '%;background:' + corA + ';opacity:0.8;"></div>'
+      + '<div class="pb-b" style="flex:1;background:' + corB + ';opacity:0.8;"></div>'
+      + '</div><div class="prob-nums"><span style="color:' + corA + '">' + pA + '%</span>'
+      + '<span style="color:#94a3b8">' + jogo.data + '</span>'
+      + '<span style="color:' + corB + '">' + (100 - pA) + '%</span></div></div>';
   } else {
-    probHtml='<div class="prob-nums" style="justify-content:center;margin-top:4px;color:#94a3b8">'+jogo.data+'</div>';
+    probHtml = '<div class="prob-nums" style="justify-content:center;margin-top:4px;color:#94a3b8">' + jogo.data + '</div>';
   }
 
-  var ttHtml='';
-  if(prob&&nA&&nB){
-    ttHtml='<div class="tt"><div style="color:#E8B931;font-weight:700;margin-bottom:6px">'+jogo.id+' · '+jogo.data+'</div>'
-      +'<div style="margin-bottom:3px">'+nA+': <b>'+Math.round(prob.pA*100)+'%</b> ('+prob.gA.toFixed(2)+' gols esp.)</div>'
-      +'<div>'+nB+': <b>'+Math.round(prob.pB*100)+'%</b> ('+prob.gB.toFixed(2)+' gols esp.)</div></div>';
+  var ttHtml = '';
+  if (prob && nA && nB) {
+    ttHtml = '<div class="tt"><div style="color:#E8B931;font-weight:700;margin-bottom:6px">' + jogo.id + ' · ' + jogo.data + '</div>'
+      + '<div style="margin-bottom:3px">' + nA + ': <b>' + Math.round(prob.pA * 100) + '%</b> (' + prob.gA.toFixed(2) + ' gols esp.)</div>'
+      + '<div>' + nB + ': <b>' + Math.round(prob.pB * 100) + '%</b> (' + prob.gB.toFixed(2) + ' gols esp.)</div></div>';
   }
 
-  var div=document.createElement('div');
-  div.className='jogo-card';
-  div.innerHTML='<div class="jogo-num">'+jogo.id+'</div>'+htmlA+htmlB+probHtml+ttHtml;
+  var div = document.createElement('div');
+  div.className = 'jogo-card';
+  div.innerHTML = '<div class="jogo-num">' + jogo.id + '</div>' + htmlA + htmlB + probHtml + ttHtml;
   return div;
 }
 
-function criarColuna(dados,jogos,col) {
-  var d=document.createElement('div');
-  d.className='col-jogos'; d.style.gridColumn=col; d.style.gridRow='2';
-  jogos.forEach(function(j){d.appendChild(criarCard(dados,j));});
+function criarColuna(dados, jogos, col) {
+  var d = document.createElement('div');
+  d.className = 'col-jogos'; d.style.gridColumn = col; d.style.gridRow = '2';
+  jogos.forEach(function(j){ d.appendChild(criarCard(dados, j)); });
   return d;
 }
 
 function montarBracket(dados) {
-  var grid=document.getElementById('bracket-grid');
-  grid.querySelectorAll('.col-jogos,.final-col').forEach(function(el){el.remove();});
-  grid.appendChild(criarColuna(dados,ESQ_16,1));
-  grid.appendChild(criarColuna(dados,ESQ_8,2));
-  grid.appendChild(criarColuna(dados,ESQ_4,3));
-  grid.appendChild(criarColuna(dados,ESQ_S,4));
-  var fc=document.createElement('div');
-  fc.className='final-col'; fc.style.gridRow='2';
-  fc.innerHTML='<div class="trofeu">🏆</div><div class="final-titulo">Final · 19/07</div>';
-  fc.appendChild(criarCard(dados,FINAL));
+  var grid = document.getElementById('bracket-grid');
+  grid.querySelectorAll('.col-jogos,.final-col').forEach(function(el){ el.remove(); });
+  grid.appendChild(criarColuna(dados, ESQ_16, 1));
+  grid.appendChild(criarColuna(dados, ESQ_8, 2));
+  grid.appendChild(criarColuna(dados, ESQ_4, 3));
+  grid.appendChild(criarColuna(dados, ESQ_S, 4));
+  var fc = document.createElement('div');
+  fc.className = 'final-col'; fc.style.gridRow = '2';
+  fc.innerHTML = '<div class="trofeu">🏆</div><div class="final-titulo">Final · 19/07</div>';
+  fc.appendChild(criarCard(dados, FINAL));
   grid.appendChild(fc);
-  grid.appendChild(criarColuna(dados,DIR_S,6));
-  grid.appendChild(criarColuna(dados,DIR_4,7));
-  grid.appendChild(criarColuna(dados,DIR_8,8));
-  grid.appendChild(criarColuna(dados,DIR_16,9));
+  grid.appendChild(criarColuna(dados, DIR_S, 6));
+  grid.appendChild(criarColuna(dados, DIR_4, 7));
+  grid.appendChild(criarColuna(dados, DIR_8, 8));
+  grid.appendChild(criarColuna(dados, DIR_16, 9));
 }
 
 function montarClassificacao(dados) {
-  var container=document.getElementById('grupos-grid');
-  container.innerHTML='';
-  var grupos={};
+  var container = document.getElementById('grupos-grid');
+  container.innerHTML = '';
+  var grupos = {};
   dados.times.forEach(function(t){
-    if(!grupos[t.grupo]) grupos[t.grupo]=[];
+    if (!grupos[t.grupo]) grupos[t.grupo] = [];
     grupos[t.grupo].push(t);
   });
   Object.keys(grupos).sort().forEach(function(g){
-    var lista=grupos[g].slice().sort(function(a,b){return b.rating-a.rating;});
-    var rows=lista.map(function(t,i){
-      var iso=FLAG_ISO[t.time];
-      var fg=iso?'<img src="https://flagcdn.com/16x12/'+iso+'.png" style="border-radius:1px;">':'';
-      var mm=i<2?'<span style="color:#10b981;font-weight:700;font-size:0.7rem;">✓</span>':'';
+    var lista = grupos[g].slice().sort(function(a,b){ return b.rating - a.rating; });
+    var rows = lista.map(function(t, i){
+      var iso = FLAG_ISO[t.time];
+      var fg = iso ? '<img src="https://flagcdn.com/16x12/'+iso+'.png" style="border-radius:1px;">' : '';
+      var mm = i < 2 ? '<span style="color:#10b981;font-weight:700;font-size:0.7rem;">✓</span>' : '';
       return '<tr><td><span class="pos-badge pos-'+(i+1)+'">'+(i+1)+'</span>'+fg+' '+t.time+'</td>'
         +'<td>'+mm+'</td>'
         +'<td style="font-weight:600">'+Math.round(t.rating)+'</td>'
         +'<td>'+parseFloat(t.ataque).toFixed(2)+'</td>'
         +'<td>'+parseFloat(t.defesa).toFixed(2)+'</td></tr>';
     }).join('');
-    var card=document.createElement('div');
-    card.className='grupo-card';
-    card.innerHTML='<div class="grupo-header">Grupo '+g+'</div>'
+    var card = document.createElement('div');
+    card.className = 'grupo-card';
+    card.innerHTML = '<div class="grupo-header">Grupo '+g+'</div>'
       +'<table class="grupo-table"><thead><tr><th>Seleção</th><th>MM</th><th>Rating</th><th>Atq</th><th>Def</th></tr></thead>'
       +'<tbody>'+rows+'</tbody></table>';
     container.appendChild(card);
@@ -497,8 +407,8 @@ function montarClassificacao(dados) {
 }
 
 carregarDados().then(function(dados){
-  var d=new Date(dados.atualizadoEm);
-  document.getElementById('meta').textContent='Atualizado '+d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+' · Modelo zero-prior';
+  var d = new Date(dados.atualizadoEm);
+  document.getElementById('meta').textContent = 'Atualizado ' + d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) + ' · Modelo zero-prior';
   montarBracket(dados);
   montarClassificacao(dados);
 });
