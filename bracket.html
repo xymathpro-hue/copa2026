@@ -189,12 +189,32 @@ const DIR_4 = [
 const DIR_S = [{id:'J102', a:'WJ99', b:'WJ100', data:'15/07'}];
 const FINAL = {id:'J104', a:'WJ101', b:'WJ102', data:'19/07'};
 
-function resolverSlot(slot, pos, res) {
+function resolverSlot(slot, pos, res, conf) {
   if (!slot) return null;
+  // Slot de posição de grupo: '1A', '2B' etc
   if (/^[12][A-L]$/.test(slot)) return pos[slot] || null;
-  if (/^3[A-L]+$/.test(slot)) return pos[slot] || null;  // ← busca no posicoes calculado pelo Apps Script
-  if (/^WJ\d+$/.test(slot)) { var r = res[slot.slice(1)]; return r && r.vencedor ? r.vencedor : null; }
+  // Slot de 3º colocado: '3ABCDF' etc
+  if (/^3[A-L]+$/.test(slot)) return pos[slot] || null;
+  // Slot de vencedor de jogo: 'WJ73' etc
+  if (/^WJ\d+$/.test(slot)) {
+    var id = slot.slice(1); // 'J73'
+    // Primeiro tenta resultado encerrado
+    if (res[id] && res[id].vencedor) return res[id].vencedor;
+    // Depois tenta confronto ainda não jogado (retorna null para mostrar como pendente)
+    return null;
+  }
   return null;
+}
+
+// Resolver times de um jogo usando confrontosMM quando disponível
+function resolverTimes(jogo, pos, res, conf) {
+  var c = conf && conf[jogo.id];
+  var nA = c ? c.tA : resolverSlot(jogo.a, pos, res, conf);
+  var nB = c ? c.tB : resolverSlot(jogo.b, pos, res, conf);
+  // Se ainda é um slot (começa com W, número ou letra), resolver
+  if (nA && /^WJ/.test(nA)) nA = resolverSlot(nA, pos, res, conf);
+  if (nB && /^WJ/.test(nB)) nB = resolverSlot(nB, pos, res, conf);
+  return { nA: nA, nB: nB };
 }
 
 function flag(nome) {
@@ -215,8 +235,9 @@ function calcProb(dados, nA, nB) {
 }
 
 function criarCard(dados, jogo) {
-  var pos = dados.posicoes || {}, res = dados.resultadosMM || {};
-  var nA = resolverSlot(jogo.a, pos, res), nB = resolverSlot(jogo.b, pos, res);
+  var pos = dados.posicoes || {}, res = dados.resultadosMM || {}, conf = dados.confrontosMM || {};
+  var resolved = resolverTimes(jogo, pos, res, conf);
+  var nA = resolved.nA, nB = resolved.nB;
   var r = res[jogo.id], venc = r ? r.vencedor : null, gA = r ? r.gA : null, gB = r ? r.gB : null;
   var tA = nA ? dados.times.find(function(t){ return t.time === nA; }) : null;
   var tB = nB ? dados.times.find(function(t){ return t.time === nB; }) : null;
